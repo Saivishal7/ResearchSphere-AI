@@ -11,13 +11,8 @@ from agents.gap_agent import GapAnalysisAgent
 from agents.collaboration_agent import CollaborationAgent
 
 # Configure logging
-logger = logging.getLogger("ProfessorAgent")
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class ProfessorAgentResponse(BaseModel):

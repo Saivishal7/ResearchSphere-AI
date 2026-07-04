@@ -8,13 +8,8 @@ from tools.gemini_service import GeminiService
 from agents.faculty_retrieval_agent import FacultyRetrievalAgent, FacultyMatch, FacultyRetrievalResult
 
 # Configure logging
-logger = logging.getLogger("StudentAgent")
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class StudentAgentResponse(BaseModel):
@@ -23,6 +18,7 @@ class StudentAgentResponse(BaseModel):
     Provides complete type safety and shields future AI agents from inconsistent string formatting.
     """
     query: str
+    status: str = Field(default="success", description="Execution status: success, partial, or failed.")
     recommended_faculty: List[Dict[str, Any]] = Field(
         default_factory=list,
         description="Ranked list of recommended faculty supervisors with reasons and strengths summary."
@@ -109,6 +105,7 @@ Respond ONLY with a valid JSON object containing keys:
         if not query or not query.strip():
             return StudentAgentResponse(
                 query="",
+                status="failed",
                 recommended_faculty=[],
                 reasoning="Empty query provided. Please ask a valid question about research topics or faculty.",
                 alternative_faculty=[],
@@ -135,6 +132,7 @@ Respond ONLY with a valid JSON object containing keys:
             logger.info(f"No faculty matches returned: {msg}")
             return StudentAgentResponse(
                 query=query,
+                status="partial",
                 recommended_faculty=[],
                 reasoning=f"No faculty matches were found for your query. Reason: {msg}",
                 alternative_faculty=[],
@@ -252,6 +250,7 @@ You must respond strictly with a valid JSON object matching the schema below (Do
 
             return StudentAgentResponse(
                 query=query_val,
+                status="success",
                 recommended_faculty=recommended,
                 reasoning=reasoning_val,
                 alternative_faculty=alternatives,
@@ -262,6 +261,7 @@ You must respond strictly with a valid JSON object matching the schema below (Do
             # Highly stable defensive fallback mapping
             return StudentAgentResponse(
                 query=query,
+                status="partial",
                 recommended_faculty=[
                     {
                         "faculty_id": m.faculty_id,

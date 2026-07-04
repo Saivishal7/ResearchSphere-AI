@@ -9,13 +9,8 @@ from tools.gemini_service import GeminiService
 from ingestion.load_faculty import load_all_faculty_profiles, FacultyProfile
 
 # Configure logging
-logger = logging.getLogger("CollaborationAgent")
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class CollaboratorMatch(BaseModel):
