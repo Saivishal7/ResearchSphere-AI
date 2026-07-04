@@ -1,0 +1,8 @@
+{
+  "name": "ResearchSphereAI",
+  "version": "1.0.0",
+  "description": "Multi-Agent Research Platform",
+  "scripts": {
+    "start": "streamlit run app.py --server.port 3000"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f014",
+  "name": "Dr. Anil Kulkarni",
+  "designation": "Professor",
+  "department": "Data Science",
+  "email": "anil.kulkarni@researchsphere.edu",
+  "office": "Science Block, Room 512",
+  "research_interests": [
+    "Explainable AI",
+    "Machine Learning",
+    "Healthcare AI"
+  ],
+  "profile_summary": "Dr. Anil Kulkarni is a Professor in the Department of Data Science, dedicated to improving the transparency, fairness, and clinical interpretability of advanced machine learning systems in medicine. His research focuses on explainable AI (XAI) models, localized medical feature attribution, and diagnostic decision systems. Dr. Kulkarni's Interpretability in Medicine Group develops algorithms that provide clinical path-explanations for diagnostic deep learning models, allowing healthcare professionals to inspect and verify the reasoning behind critical predictions. His team collaborates with major research hospitals to implement fair and auditable diagnostic software, ensuring that high-stakes predictions comply with rigorous patient-care guidelines. Dr. Kulkarni has received numerous grants for his work in healthcare analytics, and serves on advisory panels discussing the ethics of AI integration in public clinical settings.",
+  "current_projects": [
+    {
+      "title": "MedExplain: Locally Interpretable Deep Diagnostics for Patient Risk Analysis",
+      "description": "Constructing mathematically auditable feature-attribution systems to provide medical professionals with transparent rationales for risk-classification outcomes."
+    },
+    {
+      "title": "FairMed: Evaluating and Mitigating Bias in Distributed Pathology Classifiers",
+      "description": "Analyzing demographic disparities across clinical datasets to ensure medical diagnostic models achieve fairness and performance parity."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Local Feature Attribution Stability in Deep Medical Imaging Models",
+      "year": 2025,
+      "conference_or_journal": "IEEE Journal of Biomedical and Health Informatics",
+      "abstract": "We analyze variations in gradient-based attribution maps under typical imaging artifacts. We propose a stabilization layer that guarantees radiologists receive consistent, repeatable visual explanations for lesion detections.",
+      "citation_count": 33
+    },
+    {
+      "title": "Evaluating Demographic Disparities in Deep Clinical Risk Models",
+      "year": 2024,
+      "conference_or_journal": "ACM Conference on Fairness, Accountability, and Transparency (FAccT)",
+      "abstract": "This study presents an auditing of risk models across diverse clinical centers. We propose a structural fairness-constraint layer that aligns prediction curves across demographic variables.",
+      "citation_count": 64
+    },
+    {
+      "title": "Auditable Diagnostics: Explaining Deep Neural Predictions to Clinicians",
+      "year": 2023,
+      "conference_or_journal": "Medical Image Computing and Computer Assisted Intervention (MICCAI)",
+      "abstract": "We construct a dual-pathway neural network that outputs both raw classifications and structured textual rationales. Clinician studies confirm that our system improves diagnostics confidence metrics by 28%.",
+      "citation_count": 45
+    }
+  ],
+  "keywords": [
+    "explainable ai",
+    "machine learning",
+    "healthcare ai",
+    "clinical interpretability",
+    "feature attribution",
+    "fairness constraints",
+    "demographic auditing",
+    "medical decision support",
+    "diagnostic validation",
+    "deep medical imaging"
+  ],
+  "capacity_status": "limited"
+}

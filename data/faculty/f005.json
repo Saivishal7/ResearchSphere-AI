@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f005",
+  "name": "Dr. Vikram Patel",
+  "designation": "Associate Professor",
+  "department": "Information Technology",
+  "email": "vikram.patel@researchsphere.edu",
+  "office": "Block C, Room 301",
+  "research_interests": [
+    "Internet of Things",
+    "Edge AI",
+    "Cloud Computing"
+  ],
+  "profile_summary": "Dr. Vikram Patel is an Associate Professor in the Department of Information Technology, specialized in the design and runtime management of distributed Internet of Things (IoT) platforms, hardware-efficient Edge AI acceleration, and scalable Cloud Computing infrastructures. His research addresses the challenges of high latency and severe bandwidth limitations in modern sensor networks by orchestrating hybrid edge-cloud offloading pipelines. Dr. Patel's Distributed Systems Lab develops smart compilation routines and lightweight neural quantization paradigms that enable resource-constrained microcontrollers to run real-time inference tasks locally. Prior to his academic career, he spent seven years as a lead system architect at a global chip manufacturing firm, where he pioneered low-power embedded processors. He frequently consults for industrial automation and smart-city engineering consortia, translating advanced academic discoveries into field-deployed smart infrastructures. Dr. Patel holds several international patents on dynamic edge scheduling techniques.",
+  "current_projects": [
+    {
+      "title": "SmartCityEdge: Distributed Video Analytics on Low-Power Urban Nodes",
+      "description": "Quantizing and distributing vision-based classification models over interconnected micro-sensors for urban flow control."
+    },
+    {
+      "title": "EcoCloud: Dynamic Edge-Cloud Offloading under Grid Constraints",
+      "description": "Developing reinforcement learning schedulers to distribute workloads across local low-power edge nodes and cloud facilities dynamically."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Quantized Edge Inference over Low-Power Wireless Microcontrollers",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Mobile Computing",
+      "abstract": "We evaluate an 8-bit integer post-training quantization pipeline tailored for cortex-M sensor chips. Our findings indicate a 3x speedup in neural computational cycles with minimal degradation in model evaluation accuracy.",
+      "citation_count": 45
+    },
+    {
+      "title": "Dynamic Container Schedulers for IoT Edge Orchestrations",
+      "year": 2024,
+      "conference_or_journal": "ACM Transactions on Embedded Computing Systems",
+      "abstract": "We introduce a high-efficiency orchestration layer for deploying lightweight micro-containers on resource-bound edge topologies. We minimize computational latency and device battery drainage using dynamic scheduling algorithms.",
+      "citation_count": 73
+    },
+    {
+      "title": "Energy-Optimal Multi-Tier Edge Cloud Offloading Heuristics",
+      "year": 2023,
+      "conference_or_journal": "IEEE Transactions on Cloud Computing",
+      "abstract": "This study maps computational offloading as a constrained optimization problem. We construct a multi-tiered heuristic that accounts for link bandwidth fluctuation and edge device power status.",
+      "citation_count": 62
+    }
+  ],
+  "keywords": [
+    "internet of things",
+    "edge ai",
+    "cloud computing",
+    "model quantization",
+    "dynamic scheduling",
+    "microcontrollers",
+    "computational offloading",
+    "smart city sensor",
+    "distributed containers",
+    "embedded processing"
+  ],
+  "capacity_status": "accepting"
+}

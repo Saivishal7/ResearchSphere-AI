@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f003",
+  "name": "Dr. Rajesh Iyer",
+  "designation": "Professor",
+  "department": "Data Science",
+  "email": "rajesh.iyer@researchsphere.edu",
+  "office": "Science Block, Room 504",
+  "research_interests": [
+    "Machine Learning",
+    "Federated Learning",
+    "Privacy Preserving AI"
+  ],
+  "profile_summary": "Dr. Rajesh Iyer is a Professor in the Department of Data Science and the Director of the Secure Intelligent Systems Lab. His academic focus lies at the intersection of large-scale distributed machine learning systems, privacy constraints, and trust-oriented statistics. Over the last decade, Dr. Iyer's research has addressed core challenges in Federated Learning, with an emphasis on devising mathematical proofs for differential privacy inside distributed model weight updates. His team specializes in engineering secure multi-party computation algorithms that allow federated institutions, such as banking networks and clinical registries, to collaborative train intelligence models without exposing raw user records. Dr. Iyer holds multiple patents in secure data aggregation techniques and participates in regulatory panels concerning data security standards in modern computing frameworks. He is a passionate educator who teaches advanced graduate classes on scalable machine learning, robust optimization, and high-performance scientific data systems.",
+  "current_projects": [
+    {
+      "title": "SecurFed: Heterogeneous Node Security in Decentralized Environments",
+      "description": "Constructing client-side differential privacy frameworks robust to poisoning and membership inference attacks on unaligned edge endpoints."
+    },
+    {
+      "title": "Multi-Institutional Diagnostic Learning over Secure Medical Ledgers",
+      "description": "Enabling collaborative hospital neural models using secure homomorphic encryption keys to train diagnostic engines securely."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Provable Differential Privacy in Non-IID Federated Topologies",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Information Forensics and Security",
+      "abstract": "We prove strict theoretical privacy bounds for distributed gradient descent on non-independent and identically distributed (non-IID) datasets. Our dynamic noise mechanism improves optimization accuracy by 15% under identical privacy budgets.",
+      "citation_count": 68
+    },
+    {
+      "title": "Secure Multiparty Aggregation with Low Communication Complexity",
+      "year": 2024,
+      "conference_or_journal": "International Conference on Machine Learning (ICML)",
+      "abstract": "We present a sparse secret sharing protocol that minimizes overhead during federated learning rounds. By utilizing optimized routing trees, we reduce client upstream communication requirements without weakening security configurations.",
+      "citation_count": 112
+    },
+    {
+      "title": "Mitigating Client Poisoning Attacks in Federated Neural Classifiers",
+      "year": 2023,
+      "conference_or_journal": "Journal of Privacy-Preserving Machine Learning",
+      "abstract": "This work develops robust geometric estimators to intercept and filter out malicious client gradient updates during runtime. Our architecture guarantees clean convergence metrics even under high adversarial node penetration.",
+      "citation_count": 48
+    }
+  ],
+  "keywords": [
+    "machine learning",
+    "federated learning",
+    "privacy preserving ai",
+    "differential privacy",
+    "homomorphic encryption",
+    "secure multiparty computation",
+    "gradient poisoning defense",
+    "distributed systems",
+    "non-iid optimization",
+    "data science"
+  ],
+  "capacity_status": "accepting"
+}

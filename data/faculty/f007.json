@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f007",
+  "name": "Dr. Kavita Nair",
+  "designation": "Associate Professor",
+  "department": "Data Science",
+  "email": "kavita.nair@researchsphere.edu",
+  "office": "Science Block, Room 411",
+  "research_interests": [
+    "Data Mining",
+    "Big Data",
+    "Explainable AI"
+  ],
+  "profile_summary": "Dr. Kavita Nair is an Associate Professor in the Department of Data Science, dedicated to extracting insights from massive, non-stationary data streams and improving the explainability of opaque machine learning architectures. Her research focuses on high-dimensional data mining, transactional pattern analysis, and the development of post-hoc explainability engines, such as SHAP and LIME derivations, tailored for complex enterprise decision systems. Dr. Nair's Big Data Analytics Lab designs algorithms that process billions of events per second with guarantees of linear scalability. Her team collaborates with global finance groups and retail giants to detect fraudulent transactions and optimize supply chains. Dr. Nair strongly advocates for interpretability in prediction pipelines, working to ensure that decisions in banking, credit scoring, and high-stakes auditing are transparent, auditable, and free of bias. She is a member of ACM SIGKDD and serves on the editorial board of multiple data mining journals.",
+  "current_projects": [
+    {
+      "title": "StreamX: Scalable Real-time Fraud Mining in High-Throughput Streams",
+      "description": "Constructing sub-linear space sketch algorithms to detect collaborative fraud ring patterns within continuous international payment streams."
+    },
+    {
+      "title": "X-Credit: Local Interpretability Pipelines for Deep Risk Scoring",
+      "description": "Developing robust mathematical formulations of feature attribution to provide clear, auditable explanations for deep tabular risk classifiers."
+    }
+  ],
+  "publications": [
+    {
+      "title": "On the Stability of Post-Hoc Explainers on High-Dimensional Tabular Data",
+      "year": 2025,
+      "conference_or_journal": "ACM SIGKDD International Conference on Knowledge Discovery",
+      "abstract": "We analyze the output variance of local feature attribution models when subjected to minor input perturbations. We propose an optimization layer that stabilizes SHAP values, guaranteeing robust explanations for neural risk classifiers.",
+      "citation_count": 29
+    },
+    {
+      "title": "Sublinear-Space Mining of Co-occurrence Signatures in Web Streams",
+      "year": 2024,
+      "conference_or_journal": "IEEE Transactions on Knowledge and Data Engineering",
+      "abstract": "This study details a memory-efficient streaming algorithm based on HyperLogLog sketches. We prove bounds on item frequency estimation errors while maintaining a constant computational footprint under heavy stream traffic.",
+      "citation_count": 52
+    },
+    {
+      "title": "Interpretable Gradient Boosting Classifiers for Loan Default Prediction",
+      "year": 2023,
+      "conference_or_journal": "International Conference on Big Data",
+      "abstract": "We construct a transparent ensemble learning architecture utilizing generalized additive models. Our model achieves predictive parity with standard deep neural networks while maintaining full mathematical interpretability.",
+      "citation_count": 41
+    }
+  ],
+  "keywords": [
+    "data mining",
+    "big data",
+    "explainable ai",
+    "post-hoc explainability",
+    "feature attribution",
+    "streaming data",
+    "fraud detection",
+    "tabular neural network",
+    "sketching algorithm",
+    "interpretability"
+  ],
+  "capacity_status": "limited"
+}

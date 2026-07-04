@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f009",
+  "name": "Dr. Meera Joshi",
+  "designation": "Associate Professor",
+  "department": "Artificial Intelligence",
+  "email": "meera.joshi@researchsphere.edu",
+  "office": "Annex B, Room 302",
+  "research_interests": [
+    "Healthcare AI",
+    "Deep Learning",
+    "Medical Imaging"
+  ],
+  "profile_summary": "Dr. Meera Joshi is an Associate Professor in the Department of Artificial Intelligence and a core investigator at the Bio-Computing and Medical Informatics Centre. Her research centers on deep learning architectures applied to clinical decision support systems, high-density genomic analysis, and medical image reconstruction. Dr. Joshi's research addresses the critical challenge of high-noise and incomplete data in clinical settings. Her team develops generative adversarial frameworks to super-resolve low-dosage CT scans and construct predictive diagnostics for cardiac anomaly detection. She has established strong cooperative ties with premier oncology centers, co-developing models that predict treatment resistance in patient cohorts. Dr. Joshi serves as an associate editor for several bio-engineering journals and has received awards for her work on deep learning for personalized medicine. She is committed to translating AI theories into clinically validated diagnostic assistance software.",
+  "current_projects": [
+    {
+      "title": "OncoPredict: Deep Learning for Dynamic Cancer Progression Modeling",
+      "description": "Utilizing recurrent and graph neural systems to model patient tumor progression and predict therapy resistance over time."
+    },
+    {
+      "title": "LowDoseResolve: Super-Resolution Synthesis for Low-Dosage Clinical Scans",
+      "description": "Designing customized generative diffusion architectures to synthesize high-resolution diagnostic slices from noisy CT scans."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Super-Resolving Low-Dosage CT Scans using Generative Diffusion Models",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Medical Imaging",
+      "abstract": "We formulate a clinical diffusion framework capable of reconstructing high-frequency structural features from low-dosage CT inputs. Radiologist evaluations confirm a 92% diagnostic parity with standard high-exposure scans.",
+      "citation_count": 38
+    },
+    {
+      "title": "Predicting Therapy Resistance in Oncological Cohorts via Graph Networks",
+      "year": 2024,
+      "conference_or_journal": "Bioinformatics and Computational Biology Journal",
+      "abstract": "We construct graph neural networks (GNNs) to model the spatial relationship of tumor cells. Our framework integrates genomic sequences and pathology scans to predict drug resistance with high statistical confidence.",
+      "citation_count": 59
+    },
+    {
+      "title": "Deep Recurrent Classifiers for Real-time Electrocardiogram Anomaly Auditing",
+      "year": 2023,
+      "conference_or_journal": "IEEE Journal of Biomedical and Health Informatics",
+      "abstract": "We propose a lightweight recurrent model with spatial attention designed to run on clinical monitors. Our model processes high-density ECG signals, identifying ventricular arrhythmias with high sensitivity.",
+      "citation_count": 47
+    }
+  ],
+  "keywords": [
+    "healthcare ai",
+    "deep learning",
+    "medical imaging",
+    "diffusion models",
+    "graph neural network",
+    "super resolution",
+    "oncology predictive model",
+    "clinical decision support",
+    "electrocardiogram analysis",
+    "biomedical engineering"
+  ],
+  "capacity_status": "accepting"
+}

@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f011",
+  "name": "Dr. Neha Kapoor",
+  "designation": "Assistant Professor",
+  "department": "Information Technology",
+  "email": "neha.kapoor@researchsphere.edu",
+  "office": "Block C, Room 215",
+  "research_interests": [
+    "Cloud Computing",
+    "Big Data",
+    "Internet of Things"
+  ],
+  "profile_summary": "Dr. Neha Kapoor is an Assistant Professor in the Department of Information Technology, specializing in the engineering of scalable cloud architectures, high-performance big data frameworks, and dynamic orchestration of Internet of Things (IoT) ecosystems. Her research focuses on optimizing compute allocation, minimizing system overhead, and developing scheduling algorithms that distribute analytical workloads across hybrid edge-cloud topologies. Dr. Kapoor's Elastic Cloud Lab conducts experiments on multi-tier clustering, real-time message brokering, and low-latency stream processing. Her team collaborates with public infrastructure groups to build resilient smart-city utilities. She has extensive experience deploying commercial distributed filesystems and high-volume pipeline managers, publishing regularly in major cloud and network systems journals. Dr. Kapoor is an active advocate for diversity in computer engineering and leads local initiatives to support young women in technology fields.",
+  "current_projects": [
+    {
+      "title": "CloudStream: Resilient Streaming over Dynamic IoT Topologies",
+      "description": "Constructing adaptive cloud ingestion layers capable of scaling up compute threads dynamically under massive, bursty IoT sensor traffic."
+    },
+    {
+      "title": "DataFlow: Energy-Efficient Workload Placement in Green Data Centers",
+      "description": "Developing mathematical workload schedulers to reduce power consumption in hyperscale cloud centers by consolidating sparse virtual machines."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Elastic Workload Provisioning in Multi-Tier Edge Cloud Environments",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Services Computing",
+      "abstract": "We describe a self-adaptive resource provisioning engine based on deep reinforcement learning. Our scheduler predicts ingestion workload peaks and adjusts container allocation dynamically, reducing SLA violations by 22%.",
+      "citation_count": 27
+    },
+    {
+      "title": "High-Throughput Message Brokering in Heterogeneous Smart City Systems",
+      "year": 2024,
+      "conference_or_journal": "IEEE Internet of Things Journal",
+      "abstract": "This work introduces a prioritized message delivery scheme tailored for low-power IoT networks. We minimize ingestion delays and evaluate transactional integrity on physical smart-grid telemetry feeds.",
+      "citation_count": 48
+    },
+    {
+      "title": "Scalable Clustering of Non-Stationary Time Series in Cloud Databases",
+      "year": 2023,
+      "conference_or_journal": "IEEE International Conference on Big Data",
+      "abstract": "We construct a distributed time-series mining algorithm that runs over partitioned cloud datastores. Our framework maintains linear computational scale-out properties while handling millions of metric dimensions.",
+      "citation_count": 33
+    }
+  ],
+  "keywords": [
+    "cloud computing",
+    "big data",
+    "internet of things",
+    "elastic scaling",
+    "container orchestration",
+    "workload scheduling",
+    "smart cities",
+    "time series databases",
+    "stream processing",
+    "resource virtualization"
+  ],
+  "capacity_status": "accepting"
+}

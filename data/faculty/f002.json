@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f002",
+  "name": "Dr. Priya Sharma",
+  "designation": "Associate Professor",
+  "department": "Artificial Intelligence",
+  "email": "priya.sharma@researchsphere.edu",
+  "office": "Annex B, Room 210",
+  "research_interests": [
+    "Computer Vision",
+    "Medical Imaging",
+    "Deep Learning"
+  ],
+  "profile_summary": "Dr. Priya Sharma is an Associate Professor within the Department of Artificial Intelligence, specialized in the development of computer vision frameworks and biomedical image computation. Her research focuses on deep neural architectures for automated tumor segmentation, early pathology detection, and low-latency diagnostic computer systems. Dr. Sharma's Laboratory for Vision Intelligence works closely with major clinical institutions to design fair, robust, and generalizable models that can operate across highly heterogeneous MRI and CT dataset modalities. She has pioneered self-supervised and contrastive learning heuristics that enable high-precision visual understanding under minimal annotational supervision. Dr. Sharma has authored over forty research papers and is a recipient of multiple research grants from government healthcare and computing technology divisions. She is dedicated to advancing clinical workflows by providing surgeons with real-time semantic segmentation during complex medical procedures. Dr. Sharma regularly serves as a reviewer for CVPR, ICCV, and IEEE Transactions on Medical Imaging, shaping the path for ethical and safe clinical AI applications.",
+  "current_projects": [
+    {
+      "title": "NeuroSeg: Self-Supervised Brain Tumor Segmentation in Low-Resolution Scans",
+      "description": "Utilizing advanced self-supervised vision models to accurately segment brain lesions in MRI scans collected from rural imaging equipment."
+    },
+    {
+      "title": "Real-time Gastrointestinal Diagnostic Analysis for Endoscopic Video Feed",
+      "description": "Building hardware-efficient convolutional neural models capable of detecting polyps and lesions under high-frame-rate constraints."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Contrastive Learning for Low-Annotation Biomedical Segmentation",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Medical Imaging",
+      "abstract": "We formulate a contrastive self-supervised pipeline that leverages raw unlabeled MRI scans. By pre-training on global scan representations, we outperform fully-supervised models while using only 10% of annotated training frames.",
+      "citation_count": 56
+    },
+    {
+      "title": "Cross-Modality Medical Vision Transformers for Brain Lesion Mapping",
+      "year": 2024,
+      "conference_or_journal": "International Conference on Computer Vision (ICCV)",
+      "abstract": "This study introduces a multi-attention Vision Transformer (ViT) that accepts and fuses inputs from both CT and MRI configurations. We demonstrate superior spatial alignment and edge preservation on brain mapping tasks.",
+      "citation_count": 94
+    },
+    {
+      "title": "Real-Time Volumetric Segmentation of Cardiac Ultrasound Feeds",
+      "year": 2023,
+      "conference_or_journal": "Medical Image Computing and Computer Assisted Intervention (MICCAI)",
+      "abstract": "We present a hardware-aware deep networks module optimized for embedded clinical monitors. Our framework processes live 3D cardiac feeds at 45 frames per second with optimal boundary delineation scores.",
+      "citation_count": 31
+    }
+  ],
+  "keywords": [
+    "computer vision",
+    "medical imaging",
+    "deep learning",
+    "tumor segmentation",
+    "contrastive learning",
+    "vision transformer",
+    "clinical ai",
+    "ultrasound diagnostics",
+    "mri analysis",
+    "self supervised vision"
+  ],
+  "capacity_status": "limited"
+}

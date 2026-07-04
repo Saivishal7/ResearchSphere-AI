@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f015",
+  "name": "Dr. Shalini Reddy",
+  "designation": "Professor",
+  "department": "Cyber Security",
+  "email": "shalini.reddy@researchsphere.edu",
+  "office": "Tech Tower, Room 108",
+  "research_interests": [
+    "Network Security",
+    "Blockchain",
+    "Privacy Preserving AI"
+  ],
+  "profile_summary": "Dr. Shalini Reddy is a Professor in the Department of Cyber Security and the Director of the Secure Digital Infrastructure Laboratory. Her research focus centers on secure network protocols, decentralized blockchain ledgers, and privacy-preserving machine learning. Over the last fifteen years, Dr. Reddy has researched cryptographic access control, privacy guarantees on distributed databases, and zero-knowledge proof applications. Her lab develops secure transactional frameworks that enable distributed IoT networks and public utilities to exchange audit data securely without disclosing sensitive metadata. Dr. Reddy's work has been supported by national cybersecurity agencies, and she actively consults on blockchain implementations for smart cities and government institutions. She is a senior member of the IEEE, publishes in prestigious cybersecurity journals, and teaches advanced graduate-level courses on blockchain, decentralized systems, and network security architectures.",
+  "current_projects": [
+    {
+      "title": "DecentralizedTrust: Zero-Knowledge Verification for IoT Data Exchanges",
+      "description": "Constructing low-latency cryptographic verification layers to validate IoT telemetry exchanges without exposing sensitive identity details."
+    },
+    {
+      "title": "SecurLedger: Scalable Blockchain Architectures for Distributed Energy Grids",
+      "description": "Implementing energy-efficient, Byzantine-resilient consensus algorithms to handle multi-party billing records across power distribution grids."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Zero-Knowledge Identity Verification for Low-Power Network Devices",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Information Forensics and Security",
+      "abstract": "We present a lightweight zero-knowledge proof construction tailored for edge hardware. Our protocol guarantees device-identity verification while reducing execution latency by 35% compared to classical approaches.",
+      "citation_count": 29
+    },
+    {
+      "title": "Scaling Byzantine Resilient Ledgers under Heavy Edge Workloads",
+      "year": 2024,
+      "conference_or_journal": "Computers & Security",
+      "abstract": "This study introduces an adaptive consensus algorithm designed to partition transaction processing. We demonstrate linear scale-out and superior throughput rates on high-speed simulated networks.",
+      "citation_count": 62
+    },
+    {
+      "title": "Privacy-Preserving Secure Multi-Party Aggregation for Energy Billing",
+      "year": 2023,
+      "conference_or_journal": "IEEE Internet of Things Journal",
+      "abstract": "We construct a secure billing protocol using homomorphic encryption. Our framework aggregates energy consumption patterns securely, preventing utility providers from tracing individual consumer usage histories.",
+      "citation_count": 48
+    }
+  ],
+  "keywords": [
+    "network security",
+    "blockchain",
+    "privacy preserving ai",
+    "zero knowledge proof",
+    "byzantine consensus",
+    "cryptographic protocol",
+    "homomorphic encryption",
+    "smart grids",
+    "iot telemetry security",
+    "decentralized systems"
+  ],
+  "capacity_status": "not_accepting"
+}

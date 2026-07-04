@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f001",
+  "name": "Dr. Aarav Mehta",
+  "designation": "Professor",
+  "department": "Computer Science",
+  "email": "aarav.mehta@researchsphere.edu",
+  "office": "Block A, Room 402",
+  "research_interests": [
+    "Natural Language Processing",
+    "Large Language Models",
+    "Generative AI"
+  ],
+  "profile_summary": "Dr. Aarav Mehta is a Professor in the Department of Computer Science with over fifteen years of academic and industrial experience in natural language understanding. His research primarily revolves around the design, pre-training, optimization, and alignment of Large Language Models (LLMs) to ensure stable reasoning and reduce hallucination thresholds. Dr. Mehta's lab focuses on building low-resource multilingual language technologies specifically tailored to Indian regional dialects. He is currently investigating parameter-efficient fine-tuning (PEFT) mechanisms, including low-rank adaptation techniques, to deploy state-of-the-art transformer models in client-side settings. By integrating cognitive architectures with neural language interfaces, his work seeks to bridge the gaps in zero-shot task generalizability across distinct scientific and technical disciplines. Dr. Mehta actively mentors graduate and doctoral researchers, publishing frequently in elite computational linguistics venues including ACL, EMNLP, and NAACL. He serves on various academic committees focused on computing curriculum modernizations and maintains strong collaborative networks with global research laboratories working on open-source language models.",
+  "current_projects": [
+    {
+      "title": "IndicLLM: Multilingual Foundation Models for Regional Languages",
+      "description": "Developing high-performing low-resource transformer architectures optimized for regional Indian dialects using specialized vocabulary expansion."
+    },
+    {
+      "title": "FactAlign: Reducing Hallucinations via Fact-Checked RLHF",
+      "description": "Creating reinforcement learning feedback loops based on dynamic verification graphs to improve generative truthfulness in enterprise AI."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Parameter-Efficient Fine-Tuning for Low-Resource Languages",
+      "year": 2025,
+      "conference_or_journal": "ACL Conference on Empirical Methods in NLP",
+      "abstract": "We present an evaluation of adapter-based and prefix-tuning modifications applied to large bilingual models. Our experiments demonstrate a 40% reduction in trainable parameters with negligible drops in translation BLEU scores for regional Indic dialects.",
+      "citation_count": 42
+    },
+    {
+      "title": "On the Hallucination Threshold of Generative Attention Decoders",
+      "year": 2024,
+      "conference_or_journal": "Journal of Artificial Intelligence Research",
+      "abstract": "This study analyzes the mathematical boundaries under which attention mechanisms fail to map correct target entities. We propose a self-corrective decoding heuristic that intercepts and evaluates confidence levels prior to token generation.",
+      "citation_count": 87
+    },
+    {
+      "title": "Instruction-Tuning Strategies for Scientific Domain Synthesis",
+      "year": 2023,
+      "conference_or_journal": "NeurIPS Workshop on Generative Systems",
+      "abstract": "We explore high-density training corpuses tailored for automated hypothesis synthesis. We construct a specialized scientific instruction dataset and evaluate pre-trained base decoders on structured reasoning evaluations.",
+      "citation_count": 15
+    }
+  ],
+  "keywords": [
+    "natural language processing",
+    "large language models",
+    "generative ai",
+    "indic llm",
+    "parameter efficient tuning",
+    "hallucination reduction",
+    "transformer optimization",
+    "reinforcement learning",
+    "multilingual processing",
+    "cognitive architecture"
+  ],
+  "capacity_status": "accepting"
+}

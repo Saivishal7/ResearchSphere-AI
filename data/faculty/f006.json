@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f006",
+  "name": "Dr. Amit Verma",
+  "designation": "Associate Professor",
+  "department": "Artificial Intelligence",
+  "email": "amit.verma@researchsphere.edu",
+  "office": "Annex C, Room 108",
+  "research_interests": [
+    "Multi-Agent Systems",
+    "Reinforcement Learning",
+    "Robotics"
+  ],
+  "profile_summary": "Dr. Amit Verma is an Associate Professor in the Department of Artificial Intelligence, where he leads the Autonomous Intelligent Robotics Lab (AIR-Lab). His primary research interests are in multi-agent reinforcement learning (MARL), scalable swarm intelligence, and mobile robotics navigation in unstructured, unpredictable settings. Dr. Verma focuses on formulating robust, decentralized coordination algorithms that allow hundreds of micro-UAVs or autonomous ground vehicles to complete cooperative objectives without a single point of failure. His theoretical contributions include pioneering structural bounds for distributed policy gradients in cooperative-competitive environments. He has extensive consulting experience with warehouse logistics developers and national aerospace laboratories. Through integration of advanced control theory with state-of-the-art neural architectures, his lab is setting new standards for secure and responsive machine swarms. Dr. Verma is actively involved in mentoring doctoral researchers and regularly presents his work at top venues such as AAMAS, ICRA, and IROS.",
+  "current_projects": [
+    {
+      "title": "SwarmNet: Decentralized Coordination for Heterogeneous Micro-UAVs",
+      "description": "Constructing robust multi-agent cooperative policy models enabling micro-drones to perform emergency rescue missions under extreme packet loss."
+    },
+    {
+      "title": "Adaptive Robotic Navigation in Hazardous Underground Topologies",
+      "description": "Developing deep reinforcement learning models with continuous action controls to optimize trajectory generation on rugged terrains."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Decentralized Cooperative Policy Gradients in Partially Observable Topologies",
+      "year": 2025,
+      "conference_or_journal": "Autonomous Agents and Multi-Agent Systems (AAMAS)",
+      "abstract": "We describe a novel actor-critic formulation using temporal memory links to stabilize multi-agent policy networks in highly dynamic, non-stationary environments. We demonstrate resilient convergence on cooperative-competitive tracking tasks.",
+      "citation_count": 34
+    },
+    {
+      "title": "Swarm Intelligence for Autonomous Collision Avoidance in Narrow Corridors",
+      "year": 2024,
+      "conference_or_journal": "IEEE International Conference on Robotics and Automation (ICRA)",
+      "abstract": "This work introduces a decentralized local coordination protocol based on velocity-space obstacle avoidance coupled with lightweight deep Q-networks. We demonstrate zero collisions on a physically deployed fleet of 20 micro-UAVs.",
+      "citation_count": 61
+    },
+    {
+      "title": "Continuous Control Reinforcement Learning for Legged Robotics",
+      "year": 2023,
+      "conference_or_journal": "International Journal of Robotics Research",
+      "abstract": "We evaluate hierarchical actor-critic models designed to decouple high-level navigational path planning from high-frequency joint gait adjustments. Our framework improves adaptation times on shifting physical terrains.",
+      "citation_count": 45
+    }
+  ],
+  "keywords": [
+    "multi-agent systems",
+    "reinforcement learning",
+    "robotics",
+    "swarm intelligence",
+    "uav coordination",
+    "decentralized control",
+    "actor critic model",
+    "autonomous navigation",
+    "continuous control",
+    "path planning"
+  ],
+  "capacity_status": "accepting"
+}

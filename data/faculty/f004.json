@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f004",
+  "name": "Dr. Sunita Deshmukh",
+  "designation": "Professor",
+  "department": "Cyber Security",
+  "email": "sunita.deshmukh@researchsphere.edu",
+  "office": "Tech Tower, Room 112",
+  "research_interests": [
+    "Cyber Security",
+    "Network Security",
+    "Blockchain"
+  ],
+  "profile_summary": "Dr. Sunita Deshmukh is a distinguished Professor in the Department of Cyber Security with more than eighteen years of experience in network security engineering, threat mitigation architectures, and blockchain networks. Her research focuses on autonomous intrusion prevention, zero-trust infrastructure, and decentralized consensus algorithms tailored for critical public utilities. Dr. Deshmukh's Secure Networks Laboratory researches techniques to detect and neutralize zero-day exploits using artificial intelligence model filters. She has pioneered blockchain-based key distribution systems that resist classical and early quantum interception methods. Her research is supported by defense agencies, energy providers, and industrial telecommunications firms. Dr. Deshmukh serves as an advisory member on cybersecurity policy frameworks at national and state levels, guiding organizations toward secure and resilient digitizations. She is a senior member of the IEEE and holds various industrial certifications in security auditing, cryptographic architecture, and penetration testing.",
+  "current_projects": [
+    {
+      "title": "SecurGrid: Decentralized Access Control for Smart Grid Operations",
+      "description": "Implementing distributed consensus ledgers to authorize and validate configuration operations across interconnected power distribution nodes."
+    },
+    {
+      "title": "AI-Driven Intrusion Defense for Software-Defined Enterprise Networks",
+      "description": "Utilizing high-throughput temporal convolutional systems to trace and neutralize active network penetration signatures in real-time."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Zero-Trust Device Authorization using Smart Contracts",
+      "year": 2025,
+      "conference_or_journal": "IEEE Internet of Things Journal",
+      "abstract": "We present a decentralized access authorization framework using blockchain smart contracts. Our system validates device integrity signatures dynamically, minimizing latency while securing the network from device masquerading attacks.",
+      "citation_count": 39
+    },
+    {
+      "title": "Intrusion Detection under Heavy Zero-Day Attack Conditions",
+      "year": 2024,
+      "conference_or_journal": "Computers & Security",
+      "abstract": "We explore deep learning classifiers for threat signature detection in high-speed enterprise streams. By employing anomaly extraction pipelines, we identify unknown network attack vectors with an false alarm rate under 0.1%.",
+      "citation_count": 82
+    },
+    {
+      "title": "Byzantine Fault Tolerant Consensus for Low-Latency Networks",
+      "year": 2023,
+      "conference_or_journal": "IEEE Transactions on Parallel and Distributed Systems",
+      "abstract": "This study introduces a streamlined Byzantine consensus algorithm optimized for private blockchain topologies. We show substantial transactional throughput improvements compared to classical proof-of-authority algorithms.",
+      "citation_count": 51
+    }
+  ],
+  "keywords": [
+    "cyber security",
+    "network security",
+    "blockchain",
+    "zero trust architecture",
+    "smart contracts",
+    "byzantine fault tolerance",
+    "intrusion detection",
+    "zero day exploits",
+    "cryptographic key distribution",
+    "threat mitigation"
+  ],
+  "capacity_status": "not_accepting"
+}

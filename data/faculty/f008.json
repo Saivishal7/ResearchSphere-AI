@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f008",
+  "name": "Dr. Rohan Gupta",
+  "designation": "Assistant Professor",
+  "department": "Computer Science",
+  "email": "rohan.gupta@researchsphere.edu",
+  "office": "Block A, Room 315",
+  "research_interests": [
+    "AI Ethics",
+    "Responsible AI",
+    "Natural Language Processing"
+  ],
+  "profile_summary": "Dr. Rohan Gupta is an Assistant Professor in the Department of Computer Science, focusing on the intersection of AI Ethics, Responsible AI practices, and Natural Language Processing. His research addresses the vital need to identify, quantify, and mitigate algorithmic biases and toxicity in large pre-trained language models. Dr. Gupta's Responsible Language Lab conducts investigations into the demographic disparities of NLP pipelines, building auditing tools that measure fairness across distinct linguistic markers. He specializes in devising algorithmic unlearning frameworks that let developers remove specific, toxic, or copyrighted content from model weights without requiring expensive full-model re-training. Dr. Gupta actively participates in international consortia focused on the socio-technical impacts of generative technologies, guiding policy frameworks for fair and transparent AI deployments. He holds a PhD in Computer Science with a minor in Philosophy, emphasizing a balanced perspective on technological development.",
+  "current_projects": [
+    {
+      "title": "UnlearnNLP: Targeted Content Removal from Large Language Models",
+      "description": "Formulating gradient-ascent weight optimization techniques to perform targeted unlearning of copyrighted training corpora without affecting model performance."
+    },
+    {
+      "title": "FairLang: Quantifying Demographic Bias in Regional Indic NLP Models",
+      "description": "Constructing comprehensive socio-linguistic test matrices to audit and correct demographic disparities in regional translation applications."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Algorithmic Unlearning of Semantic Knowledge in Autoregressive Decoders",
+      "year": 2025,
+      "conference_or_journal": "ACL Conference on Human Language Technologies",
+      "abstract": "We introduce an optimization mechanism that selectively detaches semantic associations from deep attention blocks. We demonstrate clean unlearning of specific targets while preserving general language reasoning capabilities.",
+      "citation_count": 21
+    },
+    {
+      "title": "Auditing Demographic Disparities in Modern Conversational Agents",
+      "year": 2024,
+      "conference_or_journal": "ACM Conference on Fairness, Accountability, and Transparency (FAccT)",
+      "abstract": "This paper presents an evaluation of bias in commercial dialog engines. We analyze response quality across distinct regional linguistic indicators and describe mitigating prompt alignment strategies.",
+      "citation_count": 45
+    },
+    {
+      "title": "A Socio-Technical Evaluation Matrix for Multilingual Sentiment Pipelines",
+      "year": 2023,
+      "conference_or_journal": "Responsible AI in NLP Workshop (EMNLP)",
+      "abstract": "We construct a set of standardized test suites to identify bias in regional sentiment classifiers. Our proposed mitigation layer reduces performance disparity across gendered language patterns.",
+      "citation_count": 18
+    }
+  ],
+  "keywords": [
+    "ai ethics",
+    "responsible ai",
+    "natural language processing",
+    "algorithmic unlearning",
+    "bias mitigation",
+    "fairness auditing",
+    "toxicity reduction",
+    "socio-technical system",
+    "attention de-biasing",
+    "multilingual evaluation"
+  ],
+  "capacity_status": "accepting"
+}

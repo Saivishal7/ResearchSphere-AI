@@ -1,0 +1,136 @@
+{
+  "research_areas": [
+    {
+      "area_id": "area_001",
+      "name": "Natural Language Processing",
+      "description": "Natural Language Processing (NLP) centers on computational systems that analyze, translate, and synthesize human languages. Major areas of study include syntactic parsing, named entity recognition, semantic role labeling, machine translation, and text summarization in low-resource and multilingual environments.",
+      "related_keywords": ["nlp", "translation", "syntax", "semantics", "text mining"]
+    },
+    {
+      "area_id": "area_002",
+      "name": "Computer Vision",
+      "description": "Computer Vision focuses on computational architectures that interpret and extract semantic meaning from visual signals, images, and video sequences. Research challenges include image segmentation, real-time object detection, volumetric reconstruction, optical flow analysis, and visual SLAM.",
+      "related_keywords": ["computer vision", "segmentation", "object detection", "slam", "image reconstruction"]
+    },
+    {
+      "area_id": "area_003",
+      "name": "Large Language Models",
+      "description": "Large Language Models (LLMs) represents the study of highly parameterized transformer-based decoder systems. Key research tracks include pre-training efficiency, parameter-efficient fine-tuning (PEFT), model alignment (RLHF/DPO), factual evaluation metrics, and hallucination containment.",
+      "related_keywords": ["large language models", "llm", "transformers", "alignment", "peft"]
+    },
+    {
+      "area_id": "area_004",
+      "name": "Generative AI",
+      "description": "Generative AI covers deep architectures designed to synthesize realistic data artifacts, including text, synthetic images, code, and biochemical structures. Active fields include diffusion probability networks, generative adversarial systems, and autoregressive model fine-tuning.",
+      "related_keywords": ["generative ai", "diffusion models", "gan", "autoregressive models", "synthetic data"]
+    },
+    {
+      "area_id": "area_005",
+      "name": "Multi-Agent Systems",
+      "description": "Multi-Agent Systems (MAS) involves networks of autonomous decision-making agents interacting in cooperative or competitive environments. Key topics include task decomposition, hierarchical planning, decentralized consensus, and multi-agent reinforcement learning (MARL).",
+      "related_keywords": ["multi-agent systems", "marl", "consensus protocols", "swarm intelligence", "task decomposition"]
+    },
+    {
+      "area_id": "area_006",
+      "name": "Machine Learning",
+      "description": "Machine Learning represents the baseline mathematical and statistical modeling paradigms to identify patterns in empirical data. Core subfields cover supervised and unsupervised training models, optimization algorithms, ensemble methods, and deep neural structures.",
+      "related_keywords": ["machine learning", "supervised learning", "unsupervised learning", "ensemble methods", "optimization"]
+    },
+    {
+      "area_id": "area_007",
+      "name": "Healthcare AI",
+      "description": "Healthcare AI applies machine learning models to clinical informatics, pathological diagnosis, genomic mapping, and real-time patient monitoring feeds, addressing high-stakes constraints of accuracy and safety.",
+      "related_keywords": ["healthcare ai", "clinical decision support", "genomics", "patient monitoring", "medical informatics"]
+    },
+    {
+      "area_id": "area_008",
+      "name": "Medical Imaging",
+      "description": "Medical Imaging specializes in processing radiological scans such as MRIs, CT slices, and ultrasounds. Key research topics include automated tumor boundaries segmentation, image registration, contrastive disease mapping, and low-dosage scan super-resolution.",
+      "related_keywords": ["medical imaging", "mri analysis", "ct scan", "ultrasound", "lesion detection"]
+    },
+    {
+      "area_id": "area_009",
+      "name": "Cyber Security",
+      "description": "Cyber Security covers the defense of networks, computer systems, and transactional databases from operational exploits, malicious data injection, unauthorized access, and zero-day threat actors.",
+      "related_keywords": ["cyber security", "intrusion detection", "threat mitigation", "zero day exploits", "vulnerability analysis"]
+    },
+    {
+      "area_id": "area_010",
+      "name": "Network Security",
+      "description": "Network Security involves protocols and algorithms to secure active communication streams. Focus areas cover software-defined network (SDN) intrusion detection, anomaly extraction from continuous packets, and cryptographic key routing.",
+      "related_keywords": ["network security", "intrusion prevention", "packet analysis", "cryptography", "key distribution"]
+    },
+    {
+      "area_id": "area_011",
+      "name": "Cloud Computing",
+      "description": "Cloud Computing focuses on the virtualization of compute threads, virtual storage systems, and dynamic orchestration across remote hyperscale data centers. Active topics include micro-container scaling, resource scheduling, and green cloud optimization.",
+      "related_keywords": ["cloud computing", "virtualization", "containers", "load balancing", "serverless"]
+    },
+    {
+      "area_id": "area_012",
+      "name": "Edge AI",
+      "description": "Edge AI investigates the optimization and execution of deep learning models on resource-constrained physical microcontrollers and low-power hardware, reducing compute latencies on site.",
+      "related_keywords": ["edge ai", "model quantization", "pruning", "microcontrollers", "on-board vision"]
+    },
+    {
+      "area_id": "area_013",
+      "name": "Internet of Things",
+      "description": "Internet of Things (IoT) encompasses interconnected sensor-actuator networks exchanging high-frequency telemetry. Focus areas include real-time stream ingestion, priority message queuing, and multi-tier edge offloading.",
+      "related_keywords": ["internet of things", "iot", "sensor networks", "telemetry", "workload placement"]
+    },
+    {
+      "area_id": "area_014",
+      "name": "Blockchain",
+      "description": "Blockchain studies decentralized ledgers maintained via mathematical consensus protocols. Research spans transactional auditing, Byzantine fault tolerance, smart contracts access, and trust distributions in grid systems.",
+      "related_keywords": ["blockchain", "consensus", "smart contracts", "cryptography", "byzantine resilience"]
+    },
+    {
+      "area_id": "area_015",
+      "name": "Data Mining",
+      "description": "Data Mining centers on extracting patterns, co-occurrences, and anomaly markers from high-throughput, non-stationary database records and continuous enterprise streams.",
+      "related_keywords": ["data mining", "time series", "pattern extraction", "streaming databases", "sketching"]
+    },
+    {
+      "area_id": "area_016",
+      "name": "Big Data",
+      "description": "Big Data covers high-volume, high-velocity analytical ecosystems. Active research targets distributed file partitions, sublinear-space sketches, high-density telemetry streaming, and highly scalable pipeline schedules.",
+      "related_keywords": ["big data", "hadoop", "spark", "stream processing", "high-volume databases"]
+    },
+    {
+      "area_id": "area_017",
+      "name": "Robotics",
+      "description": "Robotics studies physical autonomous platforms acting within real-world environments. Active branches include gait planning, mobile SLAM, autonomous trajectory generation, and sensor fusion navigation suites.",
+      "related_keywords": ["robotics", "navigation", "slam", "depth prediction", "continuous control"]
+    },
+    {
+      "area_id": "area_018",
+      "name": "Reinforcement Learning",
+      "description": "Reinforcement Learning (RL) investigates optimal decision modeling using rewards-based feedback. Topics cover deep Q-networks, continuous actor-critic control, and cooperative multi-agent policy gradients.",
+      "related_keywords": ["reinforcement learning", "rl", "actor-critic", "q-learning", "policy gradient"]
+    },
+    {
+      "area_id": "area_019",
+      "name": "Explainable AI",
+      "description": "Explainable AI (XAI) addresses the transparency limitations of deep neural networks. Core investigations cover feature attribution stability, SHAP values optimization, and text-based diagnosis justifications.",
+      "related_keywords": ["explainable ai", "xai", "interpretability", "feature attribution", "shap"]
+    },
+    {
+      "area_id": "area_020",
+      "name": "Responsible AI",
+      "description": "Responsible AI researches socio-technical safeguards for algorithmic fairness. Active fields cover bias identification, ethical evaluation suites, and toxicity auditing metrics in multilingual pipelines.",
+      "related_keywords": ["responsible ai", "fairness", "bias mitigation", "auditing", "ethics"]
+    },
+    {
+      "area_id": "area_021",
+      "name": "Federated Learning",
+      "description": "Federated Learning (FL) enables decentralized devices to collaboratively train machine learning classifiers without centralizing raw training datasets, preserving institutional data ownership.",
+      "related_keywords": ["federated learning", "collaborative training", "secure aggregation", "client poisoning", "non-iid"]
+    },
+    {
+      "area_id": "area_022",
+      "name": "Privacy Preserving AI",
+      "description": "Privacy Preserving AI develops mathematical and cryptographic frameworks, such as differential privacy, homomorphic gradient calculations, and secure multi-party computation, to prevent private record extraction.",
+      "related_keywords": ["privacy preserving ai", "differential privacy", "homomorphic encryption", "multiparty computation", "gradient leakage"]
+    }
+  ]
+}

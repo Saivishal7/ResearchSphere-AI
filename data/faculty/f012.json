@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f012",
+  "name": "Dr. Arjun Singh",
+  "designation": "Professor",
+  "department": "Computer Science",
+  "email": "arjun.singh@researchsphere.edu",
+  "office": "Block A, Room 501",
+  "research_interests": [
+    "Generative AI",
+    "Large Language Models",
+    "Multi-Agent Systems"
+  ],
+  "profile_summary": "Dr. Arjun Singh is a Professor in the Department of Computer Science and the principal investigator of the Intelligent Systems and Agents Lab. His research focuses on the design and deployment of Multi-Agent Systems (MAS), autonomous planning, and the collaborative alignment of Large Language Models (LLMs) to perform complex, multi-step actions. Dr. Singh's team specializes in structuring hierarchical cooperative networks where distinct generative agents decompose broad, unstructured prompts into execution pipelines, auditing each other's outputs to prevent logical gaps. His research addresses the vital need to scale LLM execution reliably under enterprise constraints. Dr. Singh actively collaborates with top global software providers and research institutions, advancing the state-of-the-art in autonomous decision agents. He has published over eighty peer-reviewed papers in major artificial intelligence conferences, and serves on advisory boards evaluating the impact of generative technologies on industrial automation workflows.",
+  "current_projects": [
+    {
+      "title": "AgentFlow: Hierarchical Multi-Agent Orchestration for Enterprise Automation",
+      "description": "Formulating structural task-allocation and consensus protocols enabling groups of generative LLM agents to execute multi-step software tasks."
+    },
+    {
+      "title": "LLM-Coop: Peer-Auditing Mechanisms to Mitigate Generative Logic Gaps",
+      "description": "Constructing dynamic peer-review and correction loops among autonomous neural networks to verify output code correctness."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Hierarchical Task Decomposition in Multi-Agent Generative Workspaces",
+      "year": 2025,
+      "conference_or_journal": "International Conference on Learning Representations (ICLR)",
+      "abstract": "We introduce an orchestration model that splits complex requests into sequential agent directives. Our peer-review paradigm allows cooperating LLM endpoints to detect and correct logic errors before output formulation, improving accuracy by 34%.",
+      "citation_count": 52
+    },
+    {
+      "title": "A Consensus Protocol for Generative Networks in Shared Environments",
+      "year": 2024,
+      "conference_or_journal": "Autonomous Agents and Multi-Agent Systems (AAMAS)",
+      "abstract": "This paper presents a formal consensus protocol designed for groups of LLM agents operating in shared software environments. We prove convergence properties on complex cooperative planning benchmarks.",
+      "citation_count": 79
+    },
+    {
+      "title": "Fine-Tuning Parameter-Efficient Transformers for Agentic Planning Tasks",
+      "year": 2023,
+      "conference_or_journal": "EMNLP Workshop on Agentic Systems",
+      "abstract": "We evaluate low-rank adapter modifications targeted for multi-step reasoning. We demonstrate that quantized, parameter-efficient language structures can achieve parity with high-parameter proprietary models on tool-use tasks.",
+      "citation_count": 38
+    }
+  ],
+  "keywords": [
+    "generative ai",
+    "large language models",
+    "multi-agent systems",
+    "autonomous agents",
+    "hierarchical planning",
+    "consensus protocols",
+    "peer auditing",
+    "task decomposition",
+    "parameter efficient tuning",
+    "tool use"
+  ],
+  "capacity_status": "accepting"
+}

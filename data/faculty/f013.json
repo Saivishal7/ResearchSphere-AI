@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f013",
+  "name": "Dr. Divya Teja",
+  "designation": "Associate Professor",
+  "department": "Artificial Intelligence",
+  "email": "divya.teja@researchsphere.edu",
+  "office": "Annex C, Room 211",
+  "research_interests": [
+    "Robotics",
+    "Computer Vision",
+    "Edge AI"
+  ],
+  "profile_summary": "Dr. Divya Teja is an Associate Professor in the Department of Artificial Intelligence, focusing on the engineering of high-performance robotic hardware, real-time computer vision models, and hardware-accelerated Edge AI systems. Her research addresses the challenges of deployability, latency, and power consumption on mobile robots and automated aerial platforms. Dr. Teja's Vision-to-Action Laboratory designs spatial mapping algorithms and deep convolutional networks optimized for specialized on-board neural processing units. Her team collaborates with local hardware designers and aerospace engineers to build smart navigation suites for autonomous systems. Dr. Teja holds multiple patents on dynamic spatial quantization techniques, and regularly reviews publications for ICRA, IROS, and IEEE Transactions on Robotics, contributing to the development of safe and efficient mobile robotics technologies.",
+  "current_projects": [
+    {
+      "title": "NavEdge: Hardware-Accelerated Navigation on Low-Power UAVs",
+      "description": "Constructing optimized spatial mapping and obstacle-avoidance vision pipelines that execute on specialized on-board edge processors."
+    },
+    {
+      "title": "VisualSlam: Real-Time Spatial Reconstruction in GPS-Denied Environments",
+      "description": "Developing robust semantic SLAM algorithms enabling mobile industrial systems to map structured warehouse areas without GPS signals."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Quantized Spatial Mapping for Low-Power On-Board Robotic Vision",
+      "year": 2025,
+      "conference_or_journal": "IEEE Transactions on Robotics",
+      "abstract": "We propose a hardware-aware spatial quantization scheme for convolutional vision models. Our design enables high-fidelity real-time classification on low-power embedded processors with negligible loss in spatial tracking precision.",
+      "citation_count": 31
+    },
+    {
+      "title": "Semantic SLAM in High-Dynamic Warehouse Environments using Deep Cues",
+      "year": 2024,
+      "conference_or_journal": "IEEE International Conference on Robotics and Automation (ICRA)",
+      "abstract": "This study details a spatial navigation framework that utilizes deep temporal cues to identify and ignore transient obstacles. We demonstrate robust localization consistency under continuous environmental shifts.",
+      "citation_count": 58
+    },
+    {
+      "title": "A Hardware-Aware Edge Acceleration Scheme for Depth Prediction Networks",
+      "year": 2023,
+      "conference_or_journal": "IROS Conference on Intelligent Robots",
+      "abstract": "We evaluate an on-board depth prediction module optimized for micro-UAVs. By pruning non-essential model channels, we reduce power consumption by 35% while maintaining spatial resolution boundaries.",
+      "citation_count": 42
+    }
+  ],
+  "keywords": [
+    "robotics",
+    "computer vision",
+    "edge ai",
+    "embedded hardware acceleration",
+    "spatial mapping",
+    "semantic slam",
+    "uav navigation",
+    "depth prediction",
+    "model pruning",
+    "autonomous systems"
+  ],
+  "capacity_status": "limited"
+}

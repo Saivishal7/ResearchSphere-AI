@@ -1,0 +1,6 @@
+{
+  "name": "ResearchSphere AI",
+  "description": "Terminal-Based Agentic AI Research Matching & Collaboration Assistant",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

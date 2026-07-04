@@ -1,0 +1,60 @@
+{
+  "faculty_id": "f010",
+  "name": "Dr. Sanjay Rao",
+  "designation": "Professor",
+  "department": "Cyber Security",
+  "email": "sanjay.rao@researchsphere.edu",
+  "office": "Tech Tower, Room 204",
+  "research_interests": [
+    "Federated Learning",
+    "Privacy Preserving AI",
+    "Cyber Security"
+  ],
+  "profile_summary": "Dr. Sanjay Rao is a Professor in the Department of Cyber Security and the co-director of the Decentralized Trust and Security Lab. His research focuses on the intersection of decentralized machine learning and systemic computer security, with a strong emphasis on federated learning systems and privacy-preserving AI. Dr. Rao's team specializes in evaluating vulnerabilities in federated frameworks, discovering novel model-poisoning techniques, and crafting robust mathematical defenses such as secure aggregation and homomorphic computation. His lab works to ensure that distributed edge models deployed in security-critical areas like smart transportation and financial systems cannot be exploited to leak proprietary training data. Dr. Rao's research has been funded by national security councils and private financial institutions. He is a frequent speaker at global security summits and teaches courses on secure cloud systems, cryptographic network protocols, and adversarial machine learning.",
+  "current_projects": [
+    {
+      "title": "FedIntercept: Analyzing Data Reconstruction Vulnerabilities in Edge Learning",
+      "description": "Investigating vulnerabilities in federated neural networks to secure gradient updates against multi-party membership inference attacks."
+    },
+    {
+      "title": "RobustAgg: Decentralized Gradient Defenses for Multi-Tenant Systems",
+      "description": "Formulating robust mathematical estimators to identify and ignore malicious gradients in decentralized environments."
+    }
+  ],
+  "publications": [
+    {
+      "title": "Gradient Leakage Defense via Homomorphic Noise Injection",
+      "year": 2025,
+      "conference_or_journal": "ACM Conference on Computer and Communications Security (CCS)",
+      "abstract": "We present a client-side gradient encryption protocol that utilizes homomorphic additions. By injecting controlled, structured noise into the encrypted updates, we prevent raw pixel reconstruction attacks from malicious aggregators.",
+      "citation_count": 41
+    },
+    {
+      "title": "Evaluating Adversarial Robustness of Federated Classifiers in Smart Cities",
+      "year": 2024,
+      "conference_or_journal": "IEEE Transactions on Smart Grid",
+      "abstract": "This study analyzes the vulnerabilities of distributed grid models to client poisoning. We propose an inline filtering system that assesses the consistency of incoming edge parameters, maintaining accuracy during active attacks.",
+      "citation_count": 76
+    },
+    {
+      "title": "Homomorphic Secure Multi-Party Aggregation on Resource-Constrained Nodes",
+      "year": 2023,
+      "conference_or_journal": "IEEE Transactions on Information Forensics and Security",
+      "abstract": "We introduce a low-overhead cryptographic scheme designed to run secure aggregations on microcontrollers. Our framework achieves high security guarantees while reducing execution time by 40%.",
+      "citation_count": 53
+    }
+  ],
+  "keywords": [
+    "federated learning",
+    "privacy preserving ai",
+    "cyber security",
+    "gradient leakage defense",
+    "homomorphic encryption",
+    "membership inference",
+    "adversarial machine learning",
+    "smart grid security",
+    "secure aggregation",
+    "cryptographic protocol"
+  ],
+  "capacity_status": "limited"
+}
