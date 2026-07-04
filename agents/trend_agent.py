@@ -9,13 +9,8 @@ from tools.gemini_service import GeminiService
 from graph.state import ResearchState
 
 # Configure logging
-logger = logging.getLogger("TrendAgent")
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class TrendAgentResponse(BaseModel):
@@ -104,8 +99,11 @@ class TrendAgent:
                 status="failed"
             )
 
+        logger.info(f"Starting trend analysis for topic '{topic}'")
+
         # 1. Execute Tavily search to fetch latest context
         search_results = self._perform_tavily_search(topic)
+        logger.info(f"Tavily returned {len(search_results)} search result(s) for topic '{topic}'")
 
         # 2. Handle no search results / offline mode gracefully
         if not search_results:

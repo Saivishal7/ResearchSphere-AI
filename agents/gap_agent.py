@@ -8,13 +8,8 @@ from agents.trend_agent import TrendAgent
 from graph.state import ResearchState
 
 # Configure logging
-logger = logging.getLogger("GapAnalysisAgent")
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class GapAnalysisAgentResponse(BaseModel):
@@ -69,15 +64,19 @@ class GapAnalysisAgent:
                 status="failed"
             )
 
+        logger.info(f"Starting gap analysis for topic '{topic}'")
+
         # 1. Retrieve current trends using TrendAgent
         try:
             logger.info(f"Delegating trend discovery for topic '{topic}' to TrendAgent...")
             trend_results = self.trend_agent.analyze_trends(topic)
+            logger.info(f"TrendAgent returned status '{getattr(trend_results, 'status', 'unknown')}' for topic '{topic}'")
+
         except Exception as e:
             logger.error(f"TrendAgent failed during delegation: {e}")
             return GapAnalysisAgentResponse(
                 topic=topic,
-                identified_gaps=[],
+                identified_gaps=[f"Trend discovery failed: {e}"],
                 open_problems=[],
                 future_research=[],
                 thesis_ideas=[],
@@ -90,7 +89,7 @@ class GapAnalysisAgent:
             logger.warning(f"TrendAgent returned invalid or empty results with status '{getattr(trend_results, 'status', 'None')}'.")
             return GapAnalysisAgentResponse(
                 topic=topic,
-                identified_gaps=[],
+                identified_gaps=[f"No usable trend context was found (status: {getattr(trend_results, 'status', 'unknown')})."],
                 open_problems=[],
                 future_research=[],
                 thesis_ideas=[],
@@ -143,7 +142,8 @@ Respond strictly with a valid JSON object matching the following schema. Do not 
         try:
             logger.info("Sending trend context to GeminiService for gap analysis synthesis...")
             res_json = self.gemini.generate_json(prompt)
-            
+            logger.info(f"Gemini returned a structured payload for topic '{topic}'")
+
             if not isinstance(res_json, dict):
                 raise ValueError("Response from Gemini was not a structured dictionary.")
 

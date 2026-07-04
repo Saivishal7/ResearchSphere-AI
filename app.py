@@ -2,10 +2,17 @@
 # ResearchSphere AI - Premium Streamlit UI Shell (Phase 1)
 # Built with modern SaaS aesthetics, fluid layout, responsive components, and custom CSS
 
-import streamlit as st
+import os
 import datetime
+import logging
+from typing import Any, Dict, List, Optional
+
+import streamlit as st
 import pandas as pd
 import numpy as np
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # ==============================================================================
 # 1. PAGE SETUP & CONFIGURATION
@@ -55,174 +62,492 @@ def initialize_session_state():
 
 initialize_session_state()
 
+
+def _get_backend_status() -> Dict[str, Any]:
+    """Collects live backend availability flags for the dashboard and settings views."""
+    try:
+        from config import GEMINI_API_KEY, TAVILY_API_KEY, CHROMA_STORE_DIR
+    except Exception:
+        GEMINI_API_KEY = None
+        TAVILY_API_KEY = None
+        CHROMA_STORE_DIR = "chroma_store"
+
+    faculty_dir = os.path.join("data", "faculty")
+    try:
+        from ingestion.load_faculty import load_all_faculty_profiles
+        profiles = load_all_faculty_profiles(faculty_dir)
+        faculty_dataset_exists = bool(profiles)
+    except Exception:
+        faculty_dataset_exists = False
+
+    try:
+        from graph.build_graph import compiled_research_graph
+        langgraph_compiled = compiled_research_graph is not None
+    except Exception:
+        langgraph_compiled = False
+
+    return {
+        "gemini_configured": bool(GEMINI_API_KEY),
+        "tavily_configured": bool(TAVILY_API_KEY),
+        "chroma_configured": os.path.isdir(CHROMA_STORE_DIR) and os.listdir(CHROMA_STORE_DIR) != [] if os.path.isdir(CHROMA_STORE_DIR) else False,
+        "faculty_dataset_exists": faculty_dataset_exists,
+        "langgraph_compiled": langgraph_compiled,
+    }
+
+
+def _collect_dashboard_metrics() -> Dict[str, Any]:
+    """Builds dashboard values from the local data and backend modules."""
+    try:
+        from ingestion.load_faculty import load_all_faculty_profiles
+        profiles = load_all_faculty_profiles(os.path.join("data", "faculty"))
+    except Exception:
+        profiles = []
+
+    research_areas = sorted({interest.lower() for profile in profiles for interest in profile.research_interests})
+    agent_files = [name for name in os.listdir("agents") if name.endswith(".py") and name != "__init__.py"]
+    backend_status = _get_backend_status()
+
+    return {
+        "faculty_count": len(profiles),
+        "research_area_count": len(research_areas),
+        "agent_count": len(agent_files),
+        "backend_status": backend_status,
+    }
+
+
+def _run_langgraph_query(query: str, role: str) -> Dict[str, Any]:
+    """Executes the existing LangGraph workflow for student or professor requests."""
+    try:
+        from graph.build_graph import compiled_research_graph
+    except Exception as exc:
+        raise RuntimeError(f"LangGraph could not be compiled: {exc}") from exc
+
+    state: Dict[str, Any] = {
+        "current_query": query,
+        "user_role": role.lower() if role.lower() in {"student", "professor"} else "unknown",
+        "intent": "general_query",
+        "conversation_history": [],
+        "student_profile": None,
+        "professor_profile": None,
+        "faculty_results": None,
+        "selected_faculty": None,
+        "research_trends": None,
+        "research_gaps": None,
+        "collaboration_suggestions": None,
+        "project_recommendations": None,
+        "pending_action": None,
+        "approval_required": False,
+        "approval_status": "pending",
+        "retrieved_context": None,
+        "tool_output": None,
+        "error": None,
+        "retry_count": 0,
+        "session_id": "streamlit",
+    }
+
+    return compiled_research_graph.invoke(state)
+
+
+def _run_student_recommendation(query: str) -> Dict[str, Any]:
+    """Runs the student backend flow and returns structured faculty matches."""
+    try:
+        from agents.student_agent import StudentAgent
+        from agents.faculty_retrieval_agent import FacultyRetrievalAgent
+    except Exception as exc:
+        return {"error": f"Student backend could not be loaded: {exc}"}
+
+    try:
+        graph_result = _run_langgraph_query(query, "student")
+        faculty_results = graph_result.get("faculty_results") or []
+    except Exception as exc:
+        faculty_results = []
+        graph_error = str(exc)
+    else:
+        graph_error = None
+
+    if not faculty_results:
+        try:
+            retrieval_result = FacultyRetrievalAgent().retrieve_relevant_faculty(query=query, k=3)
+            if retrieval_result.success and retrieval_result.matches:
+                faculty_results = [match.model_dump() if hasattr(match, "model_dump") else match.dict() for match in retrieval_result.matches]
+        except Exception as exc:
+            faculty_results = []
+            graph_error = graph_error or str(exc)
+
+    try:
+        student_response = StudentAgent().search_supervisors(query)
+    except Exception as exc:
+        student_response = None
+        student_error = str(exc)
+    else:
+        student_error = None
+
+    return {
+        "matches": faculty_results,
+        "recommendations": [
+            {"name": item.get("name", ""), "match_explanation": item.get("match_explanation", ""), "rank": item.get("rank", 1)}
+            for item in (student_response.recommended_faculty if student_response else [])
+        ],
+        "reasoning": student_response.reasoning if student_response else "",
+        "error": graph_error or student_error,
+    }
+
+
+def _run_professor_action(topic: str, action: str) -> Dict[str, Any]:
+    """Runs the professor backend action requested by the user."""
+    try:
+        if action == "trend":
+            from agents.trend_agent import TrendAgent
+            response = TrendAgent().analyze_trends(topic)
+            payload = response.model_dump() if hasattr(response, "model_dump") else response.dict()
+            if payload.get("status") in {"failed", "no_results", "partial"}:
+                logger.warning(f"Professor trend action returned status '{payload.get('status')}' for topic '{topic}'")
+            return {
+                "title": "Research Trends",
+                "payload": payload,
+            }
+        if action == "gap":
+            from agents.gap_agent import GapAnalysisAgent
+            response = GapAnalysisAgent().analyze_gaps(topic)
+            payload = response.model_dump() if hasattr(response, "model_dump") else response.dict()
+            if payload.get("status") in {"failed", "partial"}:
+                logger.warning(f"Professor gap action returned status '{payload.get('status')}' for topic '{topic}'")
+            return {
+                "title": "Research Gaps",
+                "payload": payload,
+            }
+        if action == "collaboration":
+            from agents.collaboration_agent import CollaborationAgent
+            response = CollaborationAgent().suggest_collaborations(topic)
+            return {
+                "title": "Collaboration Opportunities",
+                "payload": response.model_dump() if hasattr(response, "model_dump") else response.dict(),
+            }
+    except Exception as exc:
+        return {"title": "Backend Error", "payload": {"error": str(exc)}}
+
+    return {"title": "No action selected", "payload": {}}
+
+
+def _run_project_recommendation(query: str) -> Dict[str, Any]:
+    """Runs the project recommendation agent and returns a structured recommendation."""
+    try:
+        from agents.project_recommendation_agent import ProjectRecommendationAgent
+        response = ProjectRecommendationAgent().recommend_projects(query)
+        return response
+    except Exception as exc:
+        return {"status": "failed", "reasoning": f"Project recommendation backend failed: {exc}"}
+
+
+def _build_confirmation_view() -> Dict[str, Any]:
+    """Builds a live confirmation object for the approval page from the existing session state."""
+    try:
+        from agents.confirmation_agent import ConfirmationAgent
+    except Exception as exc:
+        return {"error": str(exc)}
+
+    pending_action = {
+        "action": st.session_state.approval_state.get("action", "Dispatch Introduction Request"),
+        "reason": st.session_state.approval_state.get("reason", "No justification provided."),
+        "affected_faculty": st.session_state.approval_state.get("affected_faculty", []),
+        "generated_content": st.session_state.approval_state.get("generated_content", ""),
+    }
+    confirmation_agent = ConfirmationAgent()
+    confirmation_obj = confirmation_agent.build_confirmation_object(pending_action)
+    return {
+        "action": confirmation_obj.action,
+        "reason": confirmation_obj.reason,
+        "affected_faculty": confirmation_obj.affected_faculty,
+        "generated_content": confirmation_obj.generated_content,
+    }
+
+
 # ==============================================================================
 # 3. PREMIUM THEME CSS INJECTION
 # ==============================================================================
 st.markdown("""
 <style>
-/* Premium Modern Custom CSS for ResearchSphere AI UI Shell */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* Main Page Styling overrides */
+:root {
+    --primary: #2563EB;
+    --secondary: #14B8A6;
+    --accent: #6366F1;
+    --bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --surface-soft: #F8FBFF;
+    --text: #0F172A;
+    --muted: #64748B;
+    --border: #E2E8F0;
+    --shadow: 0 18px 45px -24px rgba(15, 23, 42, 0.35);
+}
+
 html, body, [class*="css"] {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #1E293B;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
 }
 
 .stApp {
-    background-color: #F8FAFC;
+    background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
 }
 
-/* Hide default streamlit branding */
-#MainMenu { visibility: hidden; }
-footer { visibility: hidden; }
-header { visibility: hidden; }
+#MainMenu, footer, header { visibility: hidden; }
 
-/* Custom containers padding and spacing */
 .block-container {
-    padding-top: 1.5rem !important;
+    padding-top: 1rem !important;
     padding-bottom: 2rem !important;
-    max-width: 1280px !important;
+    max-width: 1360px !important;
 }
 
-/* Premium Card Design */
 .custom-card {
-    background-color: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-    margin-bottom: 1.5rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(145deg, var(--surface) 0%, var(--surface-soft) 100%);
+    border: 1px solid rgba(226, 232, 240, 0.92);
+    border-radius: 16px;
+    padding: 1.25rem 1.3rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .custom-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    border-color: #CBD5E1;
+    transform: translateY(-2px);
+    box-shadow: 0 20px 45px -24px rgba(37, 99, 235, 0.35);
+    border-color: rgba(37, 99, 235, 0.16);
 }
 
-/* Metrics Dashboard Cards */
 .metric-card {
-    background-color: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 1.25rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 16px;
+    padding: 1.1rem 1.15rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
+    min-height: 132px;
 }
 
 .metric-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.04);
-    border-color: #CBD5E1;
+    transform: translateY(-3px);
+    box-shadow: 0 20px 45px -24px rgba(15, 23, 42, 0.28);
 }
 
 .metric-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.65rem;
 }
 
 .metric-icon {
-    font-size: 1.25rem;
-    color: #3B82F6;
-    background-color: #EFF6FF;
-    padding: 0.375rem;
-    border-radius: 8px;
+    font-size: 1.15rem;
+    color: var(--primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(99, 102, 241, 0.16));
+    padding: 0.45rem;
+    border-radius: 10px;
     line-height: 1;
 }
 
 .metric-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #64748B;
+    font-size: 0.77rem;
+    font-weight: 700;
+    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
 }
 
 .metric-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #0F172A;
-    margin: 0.25rem 0;
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0.2rem 0 0.2rem;
+    letter-spacing: -0.03em;
 }
 
 .metric-sub {
-    font-size: 0.75rem;
-    color: #10B981;
-    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--secondary);
+    font-weight: 600;
 }
 
-/* System Status badges */
 .status-badge {
-    padding: 0.25rem 0.6rem;
+    padding: 0.32rem 0.65rem;
     border-radius: 9999px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    background-color: #F1F5F9;
-    color: #64748B;
-    border: 1px solid #E2E8F0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(248, 250, 252, 0.9);
+    color: var(--muted);
+    border: 1px solid rgba(226, 232, 240, 0.95);
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: 0.35rem;
+}
+
+.status-badge.live {
+    background: rgba(20, 184, 166, 0.12);
+    border-color: rgba(20, 184, 166, 0.18);
+    color: #0f766e;
 }
 
 .status-badge-dot {
     width: 6px;
     height: 6px;
-    background-color: #94A3B8;
+    background-color: var(--secondary);
     border-radius: 50%;
 }
 
-/* Sidebar Custom Styling */
+.hero-shell {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(99, 102, 241, 0.16));
+    border: 1px solid rgba(37, 99, 235, 0.12);
+    border-radius: 20px;
+    padding: 1.2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.25rem;
+}
+
+.hero-panel {
+    background: linear-gradient(120deg, rgba(15, 23, 42, 0.97) 0%, rgba(30, 41, 59, 0.94) 100%);
+    border-radius: 18px;
+    color: #f8fafc;
+    padding: 1.35rem 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #93c5fd;
+    margin-bottom: 0.6rem;
+}
+
+.hero-copy h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.hero-copy p {
+    margin: 0.35rem 0 0;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    max-width: 700px;
+}
+
+.hero-badges {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-top: 0.85rem;
+}
+
+.hero-meta {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.meta-card {
+    min-width: 160px;
+    background: rgba(248, 250, 252, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 0.8rem 0.9rem;
+}
+
+.meta-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 0.3rem;
+}
+
+.meta-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
 [data-testid="stSidebar"] {
-    background-color: #0F172A;
-    color: #F1F5F9;
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    border-right: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 [data-testid="stSidebar"] * {
-    color: #F1F5F9 !important;
+    color: #f8fafc !important;
 }
 
 [data-testid="stSidebar"] .stSelectbox label {
-    color: #94A3B8 !important;
+    color: #94a3b8 !important;
 }
 
-/* Customize Streamlit Buttons to match SaaS styling */
+[data-testid="stSidebar"] div.stButton > button {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.45rem;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+[data-testid="stSidebar"] div.stButton > button:hover {
+    transform: translateX(2px);
+    background: rgba(37, 99, 235, 0.18);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.24), rgba(99, 102, 241, 0.2));
+    border-color: rgba(191, 219, 254, 0.18);
+}
+
 div.stButton > button {
-    background-color: #FFFFFF;
-    color: #1E293B;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+    color: var(--text);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 999px;
+    padding: 0.7rem 1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
     transition: all 0.2s ease;
     width: 100%;
+    box-shadow: 0 8px 20px -16px rgba(15, 23, 42, 0.28);
 }
 
 div.stButton > button:hover {
-    border-color: #3B82F6;
-    color: #3B82F6;
-    background-color: #F8FAFC;
+    border-color: rgba(37, 99, 235, 0.26);
+    color: var(--primary);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-shadow: 0 12px 24px -16px rgba(37, 99, 235, 0.36);
 }
 
 div.stButton > button:active {
     transform: translateY(0);
 }
 
-/* Custom Notification and HIPLO boxes */
 .hipl-alert {
-    background-color: #FFFBEB;
-    border-left: 4px solid #F59E0B;
-    padding: 1.25rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+    border-left: 4px solid #f59e0b;
+    padding: 1.15rem 1.2rem;
+    border-radius: 14px;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 12px 28px -20px rgba(245, 158, 11, 0.28);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -231,19 +556,19 @@ div.stButton > button:active {
 # 4. LEFT SIDEBAR (LOGO, ROLE SELECTOR, & NAVIGATION)
 # ==============================================================================
 with st.sidebar:
-    # Title / Branding
     st.markdown("""
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; margin-bottom: 0.25rem;">
-        <span style="font-size: 2rem; line-height: 1;">🪐</span>
-        <span style="font-size: 1.45rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.03em;">ResearchSphere</span>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem; margin-bottom: 0.7rem; padding: 0.2rem 0 0.2rem;">
+        <div style="width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2563EB 0%, #6366F1 100%); box-shadow: 0 12px 25px -16px rgba(37, 99, 235, 0.55); font-size: 1.2rem;">🪐</div>
+        <div>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">ResearchSphere</div>
+            <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 0.1rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;">Multi-Agent Orchestration</div>
+        </div>
     </div>
-    <div style="font-size: 0.75rem; color: #64748B; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Multi-Agent Orchestration</div>
     """, unsafe_allow_html=True)
 
-    # User Role Selector
-    st.markdown("<hr style='border-color: #1E293B; margin: 1rem 0;'>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size: 0.75rem; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>USER PERSONA ROLE</div>", unsafe_allow_html=True)
-    
+    st.markdown("<div style='height: 0.35rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.7rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 0.65rem;'>Workspace Role</div>", unsafe_allow_html=True)
+
     roles_list = ["Student", "Professor", "Admin"]
     selected_role = st.selectbox(
         "User Persona Role",
@@ -256,10 +581,9 @@ with st.sidebar:
         st.session_state.role = selected_role
         st.rerun()
 
-    # Navigation Menu
-    st.markdown("<hr style='border-color: #1E293B; margin: 1.5rem 0 1rem 0;'>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size: 0.75rem; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>NAVIGATION</div>", unsafe_allow_html=True)
-    
+    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.7rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 0.6rem;'>Navigation</div>", unsafe_allow_html=True)
+
     pages_list = [
         "🏠 Dashboard",
         "🎓 Student Portal",
@@ -271,23 +595,18 @@ with st.sidebar:
         "⚙️ Settings",
         "ℹ️ About"
     ]
-    
-    selected_page = st.radio(
-        "Navigation Menu",
-        pages_list,
-        index=pages_list.index(st.session_state.current_page) if st.session_state.current_page in pages_list else 0,
-        label_visibility="collapsed",
-        key="sidebar_nav_radio"
-    )
-    if selected_page != st.session_state.current_page:
-        st.session_state.current_page = selected_page
-        st.rerun()
 
-    # Muted details
+    for page in pages_list:
+        is_active = page == st.session_state.current_page
+        if st.button(page, key=f"nav_{page}", use_container_width=True, type="primary" if is_active else "secondary"):
+            st.session_state.current_page = page
+            st.rerun()
+
+    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
     st.markdown("""
-    <div style="position: fixed; bottom: 1.5rem; left: 1rem; font-size: 0.75rem; color: #475569;">
-        <div><b>Node ID:</b> main-orchestrator</div>
-        <div><b>Session State:</b> Local Storage</div>
+    <div style="padding: 0.8rem 0.85rem; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); font-size: 0.74rem; color: #94A3B8; line-height: 1.45;">
+        <div><b style="color: #F8FAFC;">Node ID:</b> main-orchestrator</div>
+        <div><b style="color: #F8FAFC;">Session State:</b> Local Storage</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -297,28 +616,30 @@ with st.sidebar:
 current_time_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 st.markdown(f"""
-<div class="custom-card" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: white; border: none; padding: 1.5rem 2rem; margin-bottom: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <h1 style="margin: 0; font-size: 1.75rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem;">
-                ResearchSphere AI
-            </h1>
-            <p style="margin: 0.25rem 0 0 0; color: #94A3B8; font-size: 0.9rem; font-weight: 400;">AI-Powered Research Collaboration Platform</p>
+<div class="hero-shell">
+    <div class="hero-panel">
+        <div class="hero-copy">
+            <div class="hero-pill">ResearchSphere AI • Phase 1</div>
+            <h1>ResearchSphere AI</h1>
+            <p>AI-powered research collaboration workflows for students, professors, and administrators with a calmer, premium experience.</p>
+            <div class="hero-badges">
+                <span class="status-badge live"><span class="status-badge-dot"></span> Live shell</span>
+                <span class="status-badge"><span class="status-badge-dot"></span> Multi-agent ready</span>
+                <span class="status-badge"><span class="status-badge-dot"></span> Human review enabled</span>
+            </div>
         </div>
-        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-            <div style="text-align: right;">
-                <div style="font-size: 0.7rem; color: #64748B; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Current UTC Time</div>
-                <div style="font-size: 0.85rem; font-weight: 600; color: #F8FAFC; margin-top: 0.125rem;">{current_time_str}</div>
+        <div class="hero-meta">
+            <div class="meta-card">
+                <span class="meta-label">Current UTC time</span>
+                <span class="meta-value">{current_time_str}</span>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 0.7rem; color: #64748B; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Active Role</div>
-                <div style="font-size: 0.85rem; font-weight: 600; color: #3B82F6; margin-top: 0.125rem;">{st.session_state.role}</div>
+            <div class="meta-card">
+                <span class="meta-label">Active role</span>
+                <span class="meta-value">{st.session_state.role}</span>
             </div>
-            <div style="text-align: right;">
-                <div style="font-size: 0.7rem; color: #64748B; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Backend Status</div>
-                <div style="font-size: 0.85rem; font-weight: 600; color: #94A3B8; display: flex; align-items: center; gap: 0.375rem; justify-content: flex-end; margin-top: 0.125rem;">
-                    <span style="width: 7px; height: 7px; background-color: #64748B; border-radius: 50%;"></span>Unknown (Phase 1)
-                </div>
+            <div class="meta-card">
+                <span class="meta-label">Backend status</span>
+                <span class="meta-value">{'Live' if _get_backend_status()['langgraph_compiled'] else 'Needs config'}</span>
             </div>
         </div>
     </div>
@@ -333,50 +654,53 @@ st.markdown(f"""
 # PAGE A: 🏠 Dashboard
 # ------------------------------------------------------------------------------
 if st.session_state.current_page == "🏠 Dashboard":
+    dashboard_metrics = _collect_dashboard_metrics()
+    backend_status = dashboard_metrics["backend_status"]
+
     # 1. Metric Cards
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <div class="metric-header">
                 <span class="metric-label">Faculty Profiles</span>
                 <span class="metric-icon">📁</span>
             </div>
-            <div class="metric-value">15</div>
-            <span class="metric-sub">✓ Fully Indexed</span>
+            <div class="metric-value">{dashboard_metrics['faculty_count']}</div>
+            <span class="metric-sub">✓ Loaded from data/faculty</span>
         </div>
         """, unsafe_allow_html=True)
     with col2:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <div class="metric-header">
                 <span class="metric-label">Research Areas</span>
                 <span class="metric-icon">🏷️</span>
             </div>
-            <div class="metric-value">12</div>
-            <span class="metric-sub">✓ Domains Segmented</span>
+            <div class="metric-value">{dashboard_metrics['research_area_count']}</div>
+            <span class="metric-sub">✓ Derived from faculty profiles</span>
         </div>
         """, unsafe_allow_html=True)
     with col3:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <div class="metric-header">
                 <span class="metric-label">AI Agents</span>
                 <span class="metric-icon">🤖</span>
             </div>
-            <div class="metric-value">9</div>
-            <span class="metric-sub">✓ Active Specializations</span>
+            <div class="metric-value">{dashboard_metrics['agent_count']}</div>
+            <span class="metric-sub">✓ Active backend modules</span>
         </div>
         """, unsafe_allow_html=True)
     with col4:
-        st.markdown("""
+        st.markdown(f"""
         <div class="metric-card">
             <div class="metric-header">
                 <span class="metric-label">System Status</span>
                 <span class="metric-icon">⚡</span>
             </div>
-            <div class="metric-value" style="color:#64748B;">Standby</div>
-            <span class="metric-sub" style="color:#64748B;">Phase 1 Frontend Shell</span>
+            <div class="metric-value" style="color:{'#10B981' if backend_status['langgraph_compiled'] else '#64748B'};">{'Online' if backend_status['langgraph_compiled'] else 'Standby'}</div>
+            <span class="metric-sub" style="color:{'#10B981' if backend_status['langgraph_compiled'] else '#64748B'};">{'Live workflow available' if backend_status['langgraph_compiled'] else 'Backend needs configuration'}</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -444,32 +768,32 @@ if st.session_state.current_page == "🏠 Dashboard":
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("""
+        st.markdown(f"""
         <div class="custom-card" style="padding: 1.25rem;">
             <div style="display: flex; flex-direction: column; gap: 0.85rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.6rem; border-bottom: 1px solid #F1F5F9;">
                     <span style="font-weight: 500; font-size: 0.85rem; color: #475569;">Gemini Service</span>
-                    <span class="status-badge"><span class="status-badge-dot"></span>Unknown</span>
+                    <span class="status-badge{' live' if backend_status['gemini_configured'] else ''}"><span class="status-badge-dot"></span>{'Live' if backend_status['gemini_configured'] else 'Offline'}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.6rem; border-bottom: 1px solid #F1F5F9;">
                     <span style="font-weight: 500; font-size: 0.85rem; color: #475569;">ChromaDB Database</span>
-                    <span class="status-badge"><span class="status-badge-dot"></span>Unknown</span>
+                    <span class="status-badge{' live' if backend_status['chroma_configured'] else ''}"><span class="status-badge-dot"></span>{'Live' if backend_status['chroma_configured'] else 'Offline'}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.6rem; border-bottom: 1px solid #F1F5F9;">
                     <span style="font-weight: 500; font-size: 0.85rem; color: #475569;">LangGraph Orchestrator</span>
-                    <span class="status-badge"><span class="status-badge-dot"></span>Unknown</span>
+                    <span class="status-badge{' live' if backend_status['langgraph_compiled'] else ''}"><span class="status-badge-dot"></span>{'Live' if backend_status['langgraph_compiled'] else 'Offline'}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.6rem; border-bottom: 1px solid #F1F5F9;">
                     <span style="font-weight: 500; font-size: 0.85rem; color: #475569;">Tavily Search Engine</span>
-                    <span class="status-badge"><span class="status-badge-dot"></span>Unknown</span>
+                    <span class="status-badge{' live' if backend_status['tavily_configured'] else ''}"><span class="status-badge-dot"></span>{'Live' if backend_status['tavily_configured'] else 'Offline'}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-weight: 500; font-size: 0.85rem; color: #475569;">Faculty Dataset</span>
-                    <span class="status-badge"><span class="status-badge-dot"></span>Unknown</span>
+                    <span class="status-badge{' live' if backend_status['faculty_dataset_exists'] else ''}"><span class="status-badge-dot"></span>{'Live' if backend_status['faculty_dataset_exists'] else 'Offline'}</span>
                 </div>
             </div>
             <div style="margin-top: 1.25rem; background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem; border-radius: 8px; font-size: 0.75rem; color: #64748B; line-height: 1.4;">
-                💡 <b>Developer Note:</b> These connect during Phase 2. The Streamlit shell will seamlessly consume the <code>build_graph.py</code> and <code>gemini_service.py</code> backends.
+                💡 <b>Developer Note:</b> The shell now reads live backend availability and data files from the existing project modules.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -492,57 +816,53 @@ elif st.session_state.current_page == "🎓 Student Portal":
             height=120,
             value=st.session_state.current_query
         )
-        
+
         col_f1, col_f2 = st.columns([1, 4])
         with col_f1:
-            submit_btn = st.form_submit_form_button = st.form_submit_button("🔍 Find Matches")
-        
+            submit_btn = st.form_submit_button("🔍 Find Matches")
+
         if submit_btn:
             st.session_state.current_query = student_interest
-            st.warning("⚠️ Phase 1 Sandbox: Real model routing and ChromaDB retrieval will activate during the Phase 2 integration.")
+            try:
+                st.session_state.current_results = _run_student_recommendation(student_interest)
+            except Exception as exc:
+                st.session_state.current_results = {"error": str(exc)}
 
-    # Show Illustrative Workflow & Mockup Alignment
     if st.session_state.current_query:
         st.markdown("<hr>", unsafe_allow_html=True)
-        st.markdown("### 🗺️ Orchestrated Matchmaker Output (Phase 1 Blueprint)")
-        
-        col_out1, col_out2 = st.columns([1, 1])
-        with col_out1:
-            st.markdown(f"""
-            <div class="custom-card">
-                <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Matched Supervisor Match (ChromaDB Vector Mockup)</h4>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                    <div>
-                        <span style="font-weight: 700; font-size: 1.1rem; color: #0F172A;">Dr. Sarah Jenkins</span><br>
-                        <span style="font-size: 0.8rem; color: #64748B;">Department of Computer Science</span>
-                    </div>
-                    <span style="background-color: #E0F2FE; color: #0369A1; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px;">92% Match Score</span>
-                </div>
-                <p style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin-bottom: 0.75rem;">
-                    <b>Primary Areas:</b> Medical Computer Vision, Explainable Neural Networks, Attention Mechanisms in ViTs.
-                </p>
-                <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #475569;">
-                    <b>Relevant Publication:</b> "Self-Explaining Attention Maps for Multi-Modal Breast MRI Classification", CVPR 2025.
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("### 🗺️ Orchestrated Matchmaker Output")
 
-        with col_out2:
-            st.markdown("""
-            <div class="custom-card">
-                <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Orchestrated Research Direction</h4>
-                <div style="font-weight: 700; color: #0F172A; font-size: 1.05rem; margin-bottom: 0.5rem;">
-                    Self-Explaining Attentive MRI Segmentations
+        results = st.session_state.get("current_results") or {}
+        if results.get("error"):
+            st.error(f"The student backend could not complete the request: {results['error']}")
+        elif results.get("matches"):
+            for index, match in enumerate(results["matches"][:3], start=1):
+                recommendation = next((item for item in results.get("recommendations", []) if item.get("name", "").lower() == str(match.get("name", "")).lower()), {})
+                interests = ", ".join(match.get("research_interests", [])[:4]) or "No interests listed"
+                publications = match.get("publications", []) or []
+                publication_text = ", ".join([pub.get("title", "") for pub in publications[:2] if pub.get("title")]) or "No publications listed"
+                st.markdown(f"""
+                <div class="custom-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div>
+                            <span style="font-weight: 700; font-size: 1.1rem; color: #0F172A;">{match.get('name', 'Faculty')}</span><br>
+                            <span style="font-size: 0.8rem; color: #64748B;">{match.get('department', 'Department')}</span>
+                        </div>
+                        <span style="background-color: #E0F2FE; color: #0369A1; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px;">{round(float(match.get('similarity_score', 0)) * 100, 1)}% Match Score</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin-bottom: 0.75rem;">
+                        <b>Research Interests:</b> {interests}
+                    </p>
+                    <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #475569; margin-bottom: 0.75rem;">
+                        <b>Matching Publications:</b> {publication_text}
+                    </div>
+                    <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #475569;">
+                        <b>Reason for Recommendation:</b> {recommendation.get('match_explanation', results.get('reasoning', 'Recommendation generated from the backend.'))}
+                    </div>
                 </div>
-                <p style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin-bottom: 1rem;">
-                    Integrating explainable features directly into Vision Transformer (ViT) bottleneck layers to create transparent annotations for oncology radiologists.
-                </p>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <span style="background-color: #F1F5F9; color: #475569; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 4px;">LangGraph Routed</span>
-                    <span style="background-color: #F1F5F9; color: #475569; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 4px;">FacultyRetrievalAgent</span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Submit a research topic to run the student matching workflow.")
 
 # ------------------------------------------------------------------------------
 # PAGE C: 👨‍🏫 Professor Portal
@@ -558,7 +878,7 @@ elif st.session_state.current_page == "👨‍🏫 Professor Portal":
     prof_interest = st.text_input(
         "Enter academic discipline or topic of interest:",
         placeholder="e.g., Quantum Machine Learning or Explainable Neural Networks",
-        value="Explainable Neural Networks"
+        value=st.session_state.get("professor_query", "Explainable Neural Networks")
     )
 
     col_prof1, col_prof2, col_prof3 = st.columns(3)
@@ -570,44 +890,62 @@ elif st.session_state.current_page == "👨‍🏫 Professor Portal":
         collab_trigger = st.button("🤝 Discover Potential Co-Authors")
 
     if trend_trigger or gap_trigger or collab_trigger:
-        st.warning("⚠️ Phase 1 Frontend Sandbox: The underlying agents (TrendAgent, GapAgent, and CollaborationAgent) will run in Phase 2.")
-        
+        st.session_state.professor_query = prof_interest
         st.markdown("<hr>", unsafe_allow_html=True)
-        st.markdown("### 📋 Sandbox Output Representation")
-        
+        st.markdown("### 📋 Backend Output")
+
         if trend_trigger:
-            st.markdown("""
-            <div class="custom-card">
-                <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Emerging Vectors (TrendAgent Output Illustration)</h4>
-                <ul style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 0;">
-                    <li><b>Trend A:</b> Rapid adoption of Concept Bottleneck Models (CBM) as alternatives to post-hoc explainers (+42% YoY citation).</li>
-                    <li><b>Trend B:</b> Self-explaining transformer heads configured natively in foundational LLM backbones.</li>
-                    <li><b>Trend C:</b> Interactive human-in-the-loop explanation refinement workflows.</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+            result = _run_professor_action(prof_interest, "trend")
+            payload = result.get("payload", {})
+            if payload.get("error"):
+                st.error(payload["error"])
+            else:
+                st.markdown(f"""
+                <div class="custom-card">
+                    <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Research Trends</h4>
+                    <p style="font-size: 0.9rem; color: #475569; line-height: 1.5; margin-bottom: 0.75rem;">{payload.get('summary', 'No summary available')}</p>
+                    <ul style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 0;">
+                        {''.join(f'<li><b>{item}</b></li>' for item in payload.get('emerging_topics', [])[:4])}
+                    </ul>
+                </div>
+                """, unsafe_allow_html=True)
         elif gap_trigger:
-            st.markdown("""
-            <div class="custom-card" style="border-left: 4px solid #EF4444;">
-                <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Niche Academic Gaps (GapAgent Output Illustration)</h4>
-                <ul style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 0;">
-                    <li><b>Identified Gap:</b> Absence of generalized benchmark suites evaluating explanation consistency across highly multi-modal diagnostic tasks.</li>
-                    <li><b>Niche Intersection:</b> Applying adversarial training directly on concept layers to prevent explainability spoofing attacks.</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+            result = _run_professor_action(prof_interest, "gap")
+            payload = result.get("payload", {})
+            if payload.get("error"):
+                st.error(payload["error"])
+            else:
+                st.markdown(f"""
+                <div class="custom-card" style="border-left: 4px solid #EF4444;">
+                    <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Research Gaps</h4>
+                    <ul style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin-bottom: 0;">
+                        {''.join(f'<li><b>{item}</b></li>' for item in payload.get('identified_gaps', [])[:4])}
+                    </ul>
+                </div>
+                """, unsafe_allow_html=True)
         elif collab_trigger:
-            st.markdown("""
-            <div class="custom-card" style="border-left: 4px solid #10B981;">
-                <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">Complementary Co-Authorship Pairing (CollaborationAgent Output)</h4>
-                <p style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin-bottom: 0.5rem;">
-                    <b>Recommended Match:</b> <b>Dr. Sarah Jenkins</b> (Medical Vision expert) with <b>Dr. Alan Turing</b> (NLP Theory/Explainability expert).
-                </p>
-                <p style="font-size: 0.85rem; color: #64748B; line-height: 1.5; margin: 0;">
-                    <b>Rationale:</b> Jenkins possesses rich clinical visual data; Turing has the algorithmic transformer bottlenecks. Merging these creates state-of-the-art diagnostic explainability models.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
+            result = _run_professor_action(prof_interest, "collaboration")
+            payload = result.get("payload", {})
+            if payload.get("error"):
+                st.error(payload["error"])
+            else:
+                collaborators = payload.get("recommended_collaborators", [])
+                if collaborators:
+                    for collaborator in collaborators[:3]:
+                        st.markdown(f"""
+                        <div class="custom-card" style="border-left: 4px solid #10B981;">
+                            <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-weight:600;">{collaborator.get('name', 'Collaborator')}</h4>
+                            <p style="font-size: 0.85rem; color: #475569; line-height: 1.5; margin-bottom: 0.5rem;">
+                                <b>Department:</b> {collaborator.get('department', 'Unknown')}<br>
+                                <b>Specialty:</b> {collaborator.get('specialty', 'Unknown')}
+                            </p>
+                            <p style="font-size: 0.85rem; color: #64748B; line-height: 1.5; margin: 0;">
+                                <b>Reason:</b> {collaborator.get('complementary_strength', 'No reason supplied.')}
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.info("No collaboration matches were returned by the backend.")
 
 # ------------------------------------------------------------------------------
 # PAGE D: 📊 Research Analytics
@@ -718,41 +1056,49 @@ elif st.session_state.current_page == "📁 Project Recommendations":
     </div>
     """, unsafe_allow_html=True)
 
-    # Render a premium mockup recommendation cards bento
-    st.markdown("### Generated Thesis Proposals (Demo Catalog)")
-    
-    st.markdown("""
-    <div class="custom-card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div>
-                <h3 style="margin:0 0 0.25rem 0; font-size:1.2rem; color:#0F172A; font-weight:700;">A Transparent Bottleneck Layer for Vision Transformer Architectures</h3>
-                <span style="font-size: 0.8rem; color: #64748B;">Target Area: Medical computer vision + explainability validation</span>
+    with st.form("project_recommendation_form"):
+        project_query = st.text_input(
+            "Describe your research interests or target project area:",
+            value=st.session_state.get("project_query", "Explainable AI for medical diagnostics")
+        )
+        submitted = st.form_submit_button("Generate Recommendation")
+
+    if submitted:
+        st.session_state.project_query = project_query
+        st.session_state.project_recommendation_result = _run_project_recommendation(project_query)
+
+    result = st.session_state.get("project_recommendation_result")
+    if result:
+        st.markdown("### Generated Thesis Proposal")
+        if result.get("status") == "failed":
+            st.error(result.get("reasoning", "The project recommendation backend failed."))
+        else:
+            st.markdown(f"""
+            <div class="custom-card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <h3 style="margin:0 0 0.25rem 0; font-size:1.2rem; color:#0F172A; font-weight:700;">{result.get('project_title', 'Research Proposal')}</h3>
+                        <span style="font-size: 0.8rem; color: #64748B;">{result.get('difficulty', 'Intermediate')} · {result.get('status', 'partial')}</span>
+                    </div>
+                    <span style="background-color: #F1F5F9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px;">{result.get('required_skills', ['Research'])[:2]}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h5 style="margin:0 0 0.375rem 0; font-weight:600; color:#475569; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.02em;">Problem Statement & Gap</h5>
+                        <p style="font-size:0.85rem; color:#1E293B; line-height:1.5; margin:0;">{result.get('problem_statement', 'No problem statement returned.')}</p>
+                    </div>
+                    <div>
+                        <h5 style="margin:0 0 0.375rem 0; font-weight:600; color:#475569; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.02em;">Methodology</h5>
+                        <p style="font-size:0.85rem; color:#1E293B; line-height:1.5; margin:0;">{result.get('methodology', 'No methodology returned.')}</p>
+                    </div>
+                </div>
+                <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.85rem; border-radius: 8px; font-size: 0.8rem; color: #475569; line-height: 1.4;">
+                    <b>Reasoning:</b> {result.get('reasoning', 'No reasoning returned.')}
+                </div>
             </div>
-            <span style="background-color: #F1F5F9; color: #475569; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px;">Supervisor Match: Dr. Sarah Jenkins</span>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; margin-bottom: 1rem;">
-            <div>
-                <h5 style="margin:0 0 0.375rem 0; font-weight:600; color:#475569; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.02em;">Problem Statement & Gap</h5>
-                <p style="font-size:0.85rem; color:#1E293B; line-height:1.5; margin:0;">
-                    Post-hoc explainers like Grad-CAM are often inconsistent and can spoof visual cues, creating critical trust barriers for clinical oncologists reviewing diagnostic maps.
-                </p>
-            </div>
-            <div>
-                <h5 style="margin:0 0 0.375rem 0; font-weight:600; color:#475569; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.02em;">Orchestrated Methodology</h5>
-                <p style="font-size:0.85rem; color:#1E293B; line-height:1.5; margin:0;">
-                    Deploying self-explaining Concept Bottleneck Layers directly into the feedforward blocks of Vision Transformers to output explicit, human-comprehensible bounding boxes.
-                </p>
-            </div>
-        </div>
-        
-        <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.85rem; border-radius: 8px; font-size: 0.8rem; color: #475569; line-height: 1.4;">
-            <b>Generated References:</b><br>
-            [1] Jenkins, S. "Self-Explaining Attention Maps", CVPR 2025.<br>
-            [2] Turing, A. "Bottleneck Layer Concepts in Deep Transformers", Journal of AI Theory, 2024.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Generate a recommendation to invoke the project recommendation agent.")
 
 # ------------------------------------------------------------------------------
 # PAGE G: ✅ Approval Center
@@ -765,42 +1111,42 @@ elif st.session_state.current_page == "✅ Approval Center":
     </div>
     """, unsafe_allow_html=True)
 
-    # 1. Action Notification Box
+    confirmation_view = _build_confirmation_view()
+    if confirmation_view.get("error"):
+        st.error(f"The confirmation backend could not be loaded: {confirmation_view['error']}")
+
     st.markdown(f"""
     <div class="hipl-alert">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <b style="color: #92400E; font-size: 1.1rem;">⚠️ Verification Required: {st.session_state.approval_state['action']}</b>
+            <b style="color: #92400E; font-size: 1.1rem;">⚠️ Verification Required: {confirmation_view.get('action', st.session_state.approval_state['action'])}</b>
             <span style="background-color: #FEF3C7; color: #B45309; border: 1px solid #F59E0B; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">
                 {st.session_state.approval_state['status'].upper()}
             </span>
         </div>
         <div style="color: #78350F; font-size: 0.85rem; line-height: 1.5;">
-            <b>Justification:</b> {st.session_state.approval_state['reason']}<br>
-            <b>Target Faculty Node Pair:</b> {', '.join(st.session_state.approval_state['affected_faculty'])}
+            <b>Justification:</b> {confirmation_view.get('reason', st.session_state.approval_state['reason'])}<br>
+            <b>Target Faculty Node Pair:</b> {', '.join(confirmation_view.get('affected_faculty', st.session_state.approval_state['affected_faculty']))}
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # 2. Text Editor for generated content
     edited_text = st.text_area(
         "Edit Draft Communication / Command dispatch:",
-        value=st.session_state.approval_state["generated_content"],
+        value=confirmation_view.get("generated_content", st.session_state.approval_state["generated_content"]),
         height=240,
         disabled=(st.session_state.approval_state["status"] != "Pending Verification")
     )
-    
-    # Save the updated content in session_state
+
     if edited_text != st.session_state.approval_state["generated_content"]:
         st.session_state.approval_state["generated_content"] = edited_text
 
     st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
-    # 3. Decision Buttons
     btn_col1, btn_col2, btn_col3 = st.columns(3)
     with btn_col1:
         if st.button("👍 APPROVE & AUTHORIZE DISPATCH", disabled=(st.session_state.approval_state["status"] != "Pending Verification")):
             st.session_state.approval_state["status"] = "Approved & Sent"
-            st.success("✅ Action authorized! Under real operations, this triggers the Email Dispatch Tool / Webhook pipeline.")
+            st.success("✅ Action authorized. The confirmation agent now reflects the live approval state.")
             st.rerun()
     with btn_col2:
         if st.button("❌ REJECT & DISCARD ACTION", disabled=(st.session_state.approval_state["status"] != "Pending Verification")):
@@ -821,7 +1167,7 @@ elif st.session_state.current_page == "✅ Approval Center":
                 "Would you be open to a 15-minute sync next Tuesday at 14:00 UTC?\n\n"
                 "Sincerely,\nResearchSphere Orchestrator"
             )
-            st.info("🔄 Sandbox approval state reset.")
+            st.info("🔄 Approval state reset.")
             st.rerun()
 
 # ------------------------------------------------------------------------------
@@ -835,9 +1181,8 @@ elif st.session_state.current_page == "⚙️ Settings":
     </div>
     """, unsafe_allow_html=True)
 
-    # Sandbox configurations
     st.markdown("### Model & Vector Index Controls")
-    
+
     col_s1, col_s2 = st.columns(2)
     with col_s1:
         st.selectbox("Orchestration LLM", ["Gemini 2.5 Flash", "Gemini 1.5 Pro"], index=0)
@@ -850,20 +1195,22 @@ elif st.session_state.current_page == "⚙️ Settings":
 
     st.markdown("<hr>", unsafe_allow_html=True)
     st.markdown("### Environment Variables Verified Status")
-    
+
+    backend_status = _get_backend_status()
     env_col1, env_col2 = st.columns(2)
     with env_col1:
-        st.markdown("""
+        st.markdown(f"""
         <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size:0.85rem;">
-            <div><b>GEMINI_API_KEY:</b> <span style="color:#10B981; font-weight:600;">✓ Configured</span></div>
-            <div><b>TAVILY_API_KEY:</b> <span style="color:#10B981; font-weight:600;">✓ Configured</span></div>
+            <div><b>GEMINI_API_KEY:</b> <span style="color:{'#10B981' if backend_status['gemini_configured'] else '#EF4444'}; font-weight:600;">{'✓ Configured' if backend_status['gemini_configured'] else '✗ Missing'}</span></div>
+            <div><b>TAVILY_API_KEY:</b> <span style="color:{'#10B981' if backend_status['tavily_configured'] else '#EF4444'}; font-weight:600;">{'✓ Configured' if backend_status['tavily_configured'] else '✗ Missing'}</span></div>
         </div>
         """, unsafe_allow_html=True)
     with env_col2:
-        st.markdown("""
+        st.markdown(f"""
         <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size:0.85rem;">
-            <div><b>CHROMA_PERSIST_DIR:</b> <code>./data/chroma</code></div>
-            <div><b>FACULTY_DATASET_DIR:</b> <code>./data/faculty</code></div>
+            <div><b>CHROMA_STORE_DIR:</b> <code>{os.getenv('CHROMA_STORE_DIR', 'chroma_store')}</code></div>
+            <div><b>FACULTY_DATASET_DIR:</b> <code>{os.path.join('data', 'faculty')}</code></div>
+            <div><b>Chroma configured:</b> <span style="color:{'#10B981' if backend_status['chroma_configured'] else '#EF4444'}; font-weight:600;">{'✓ Yes' if backend_status['chroma_configured'] else '✗ No'}</span></div>
         </div>
         """, unsafe_allow_html=True)
 
